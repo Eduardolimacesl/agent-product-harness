@@ -26,6 +26,13 @@ Processo end-to-end para desenvolver produtos de software com **Google Antigravi
 | 06 | **Qualidade** | `06-testing/00-testing-strategy.md` | Cobertura unitária + E2E + segurança |
 | 07 | **Deploy** | `07-deploy/00-deploy-runbook.md` | Pipeline auditado e reversível |
 
+Documentos transversais à fase de Execução:
+
+- `05-execution/01-subagent-delegation.md` — quando delegar a subagente.
+- `05-execution/02-nextjs-conventions.md` — convenções específicas deste harness (delega padrões oficiais à skill `next-best-practices`).
+- `05-execution/03-protocols.md` — MCP, Server Actions, webhooks, prep para A2A.
+- `05-execution/04-skill-template.md` — template de skill interna (`skills/`).
+
 ---
 
 ## Como usar com Antigravity
