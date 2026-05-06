@@ -67,15 +67,18 @@
 
 Quando uma sessão começa, o agente carrega na seguinte ordem (e nada mais):
 
-```
+```text
 1. AGENTS.md (raiz)                       ← sempre
-2. README.md do harness                   ← orientação geral
-3. docs/spec/00-tech-spec.md              ← arquitetura
-4. ADRs aplicáveis ao módulo da tarefa    ← apenas os relevantes
-5. docs/sprints/<sprint-atual>/<story>.md ← a story em si
-6. docs/memory/<fase>/<últimas 1–2 entradas relevantes>
-7. Os arquivos de código que o plano declara que serão tocados
+2. docs/prd/01-glossary.md                ← vocabulário canônico (sempre)
+3. docs/spec/00-tech-spec.md              ← arquitetura, apenas seção do módulo
+4. docs/spec/01-design-system.md          ← se a story tem UI
+5. ADRs aplicáveis ao módulo da tarefa    ← apenas os relevantes
+6. docs/sprints/<sprint-atual>/<story>.md ← a story em si
+7. docs/memory/<fase>/_summary.md         ← contexto de transição (se aplicável)
+8. Os arquivos de código que o plano declara que serão tocados
 ```
+
+> **Pré-flight:** se a story toca auth/RBAC/billing/PII e nenhum ADR aplicável existe em `docs/spec/adr/`, o passo 0 do plano é **redigir o ADR** — não escreve código antes (veja [`SKILL.md`](../../SKILL.md) §D).
 
 **Não carregar:**
 
@@ -114,6 +117,10 @@ Se você arrasta o contexto da Discovery para a Execução, o agente fica filos�
 
 ## Template — `docs/memory/<fase>/_summary.md`
 
+> Versão completa, com seções obrigatórias e exemplos por fase, em [`05-phase-summary-template.md`](05-phase-summary-template.md).
+
+Esqueleto mínimo:
+
 ```markdown
 # Resumo de <fase> — <YYYY-MM-DD>
 
@@ -131,9 +138,14 @@ Se você arrasta o contexto da Discovery para a Execução, o agente fica filos�
 
 ## Avisos para o próximo agente
 - ...
+
+## Harness debt observada
+- ...
 ```
 
 > **Tamanho-alvo:** ≤ 200 linhas. Se passou disso, está consolidando demais — separe.
+>
+> **Gate de transição:** sem `_summary.md` completo, a próxima fase **não começa**. O agente da fase seguinte recusa avançar e cita o item faltante (veja [`SKILL.md`](../../SKILL.md) §B).
 
 ---
 

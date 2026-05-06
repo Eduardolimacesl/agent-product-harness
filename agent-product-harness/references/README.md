@@ -18,8 +18,9 @@ Processo end-to-end para desenvolver produtos de software com **Google Antigravi
 
 | # | Fase | Documento principal | Saída esperada |
 |---|------|---------------------|----------------|
-| 01 | **Discovery** | `01-discovery/00-discovery-brief.md` | Problema validado, hipóteses, métricas |
-| 02 | **PRD** | `02-prd/00-prd-template.md` | Escopo, requisitos, critérios de aceite |
+| 01 | **Discovery** | `01-discovery/00-discovery-brief.md` + `02-elicitation-guide.md` | Problema validado, hipóteses, métricas |
+| 02 | **PRD** | `02-prd/00-prd-template.md` + `01-glossary-template.md` | Escopo, requisitos, critérios de aceite, glossário |
+| 02.5 | **Design Foundations** | `02b-design/00-design-foundations.md` | Paleta, tokens `@theme`, starter kit visual |
 | 03 | **Spec** | `03-spec/00-tech-spec.md` + ADRs | Arquitetura, contratos, decisões |
 | 04 | **Sprints** | `04-sprints/00-sprint-plan.md` | Backlog priorizado, stories quebradas |
 | 05 | **Execução** | `05-execution/00-context-protocol.md` | Código + memória limpa por fase |
@@ -32,6 +33,9 @@ Documentos transversais à fase de Execução:
 - `05-execution/02-nextjs-conventions.md` — convenções específicas deste harness (delega padrões oficiais à skill `next-best-practices`).
 - `05-execution/03-protocols.md` — MCP, Server Actions, webhooks, prep para A2A.
 - `05-execution/04-skill-template.md` — template de skill interna (`skills/`).
+- `05-execution/05-phase-summary-template.md` — `_summary.md` por fase, gate de transição.
+- `05-execution/06-plan-artifact-template.md` — Plan Artifact obrigatório (Gate 1) antes de tocar código.
+- `05-execution/07-migration-checklist.md` — schema, RLS, triggers, seeds — gate de PR para qualquer story que mexa em DB.
 
 ---
 
@@ -60,16 +64,27 @@ Documentos transversais à fase de Execução:
 
 ## Convenções de pastas no repositório
 
-```
+```text
 /
 ├── AGENTS.md                  ← rules globais p/ Antigravity (e demais agentes)
 ├── docs/
 │   ├── discovery/
 │   ├── prd/
+│   │   └── 01-glossary.md     ← vocabulário canônico (carregado em toda story)
 │   ├── spec/
-│   │   └── adr/
+│   │   ├── 01-design-system.md ← output da fase Design Foundations
+│   │   └── adr/               ← obrigatório no scaffold
 │   ├── sprints/
+│   │   └── 01/
+│   │       ├── sprint-plan.md
+│   │       └── <story-id>.md
 │   ├── memory/                ← logs de sessão por fase (ver 05-execution)
+│   │   ├── discovery/_summary.md
+│   │   ├── prd/_summary.md
+│   │   ├── spec/_summary.md
+│   │   ├── sprints/_summary.md
+│   │   ├── execution/<YYYY-MM-DD>-<story-id>.md
+│   │   └── deploys/
 │   └── runbooks/
 ├── app/                       ← Next.js App Router
 ├── components/

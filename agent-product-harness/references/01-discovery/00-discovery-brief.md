@@ -2,6 +2,8 @@
 
 > Documento da fase 01. Objetivo: validar **se vale a pena construir** antes de gastar 1 linha de código.
 > Tempo recomendado: 1–5 dias. Se passar disso, ou o problema é grande demais, ou não está claro.
+>
+> **Roteiro de entrevista:** o agente conduz esta fase usando [`02-elicitation-guide.md`](02-elicitation-guide.md) — árvore de perguntas, padrões de challenge e critério de pronto. Sem o guide, este brief vira preenchimento de campo.
 
 **Owner:** `<nome>`
 **Status:** `🔍 explorando | ✅ validado | ❌ descartado`
@@ -161,11 +163,25 @@ Liste fontes — entrevistas, dados, suporte, concorrência.
 
 > Cole no chat do agente:
 
-```
+```text
 Sua tarefa é me ajudar a preencher este Discovery Brief.
 Você NÃO vai escrever código nesta fase.
-Faça perguntas até conseguir preencher cada seção com evidência ou
-explicitamente marcar como "hipótese a validar".
-Quando terminar, gere um Artifact com o brief preenchido e
-liste 3 perguntas críticas que ainda não tenho resposta.
+
+Antes de começar, leia references/01-discovery/02-elicitation-guide.md.
+Conduza a entrevista seguindo a árvore de perguntas seção por seção,
+aplicando os padrões de challenge listados (1 stakeholder = 1 papel
+real; toda métrica precisa de baseline; toda restrição precisa de
+número; toda hipótese precisa de critério de invalidação).
+
+Quando terminar, gere um Artifact com:
+1. O brief preenchido.
+2. As 3 perguntas críticas que ainda não tenho resposta — com sugestão
+   de como obtê-las (entrevista, dado, experimento).
+3. Veredicto verde/amarelo/vermelho em cada item da checklist
+   "pronto para PRD" do guide.
+4. Recomendação: avançar para PRD, voltar para entrevista, ou pivotar.
+
+NÃO sinalize "pronto" se a checklist falhar — mesmo que eu peça.
+O sponsor decide o gate; você entrega material com qualidade
+suficiente para a decisão ser honesta.
 ```

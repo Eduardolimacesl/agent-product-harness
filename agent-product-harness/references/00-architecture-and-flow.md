@@ -113,18 +113,22 @@ A interação entre os planos é **mediada por documentos**, nunca por chat efê
 
 ---
 
-## 4. As sete fases — fluxo macro
+## 4. As oito fases — fluxo macro
 
 ```
-   Discovery ──► PRD ──► Spec ──► Sprint ──► Execução ──► Testes ──► Deploy
-      │           │       │         │           │           │          │
-      ▼           ▼       ▼         ▼           ▼           ▼          ▼
-   brief +     PRD     Tech Spec  Sprint     código +    suíte de    runbook
-   canvas    aprovado  + ADRs      plan      Artifacts   testes      executado
-                                  + stories                          + smoke
+   Discovery ──► PRD ──► Design ──► Spec ──► Sprint ──► Execução ──► Testes ──► Deploy
+      │           │     Foundations  │         │           │           │          │
+      │           │       │          │         │           │           │          │
+      ▼           ▼       ▼          ▼         ▼           ▼           ▼          ▼
+   brief +     PRD +    paleta +  Tech Spec  Sprint     código +    suíte de    runbook
+   canvas     glossário  tokens +  + ADRs     plan      Artifacts   testes      executado
+              aprovado   starter             + stories                          + smoke
+                         kit
 ```
 
-Cada seta é um **gate**. Você não passa para a próxima fase sem o artefato da anterior aprovado. Cada gate dispara o **ritual de limpeza de contexto** descrito no protocolo.
+Cada seta é um **gate**. Você não passa para a próxima fase sem o artefato da anterior aprovado. Cada gate dispara o **ritual de limpeza de contexto** descrito no protocolo, materializado em `docs/memory/<fase>/_summary.md` (template em [`05-execution/05-phase-summary-template.md`](05-execution/05-phase-summary-template.md)).
+
+**Design Foundations** (fase 02.5) entra entre PRD e Spec sempre que o produto tem UI. Tailwind v4 com `@theme` em `globals.css` exige tokens definidos antes do primeiro componente; refazer paleta depois é caro porque cada Shadcn já consumiu os tokens errados. Detalhe completo em [`02b-design/00-design-foundations.md`](02b-design/00-design-foundations.md).
 
 ### 4.1 Discovery (fase 01)
 
@@ -148,7 +152,23 @@ Cada seta é um **gate**. Você não passa para a próxima fase sem o artefato d
 
 **Quem trabalha:** humano + 1 agente. Mesmo agente da discovery? **Não** — sessão nova, contexto limpo, mindset convergente.
 
-**Critério de saída:** todos os critérios de aceite são observáveis e binarizáveis. Aprovação dos stakeholders listados.
+**Critério de saída:** todos os critérios de aceite são observáveis e binarizáveis. Aprovação dos stakeholders listados. **Glossário** (`docs/prd/01-glossary.md`) preenchido com todo termo de domínio que aparece no PRD — vira input do bootstrap mínimo de toda story.
+
+### 4.2.5 Design Foundations (fase 02.5)
+
+**Objetivo:** travar identidade visual, tokens de design e princípios de UX **antes** de qualquer componente Shadcn ser implementado. Tailwind v4 com `@theme` em `globals.css` exige tokens definidos antes do primeiro componente.
+
+**Inputs:** PRD aprovado + brand assets (logo, referências visuais).
+
+**Outputs:** `docs/spec/01-design-system.md` + bloco `@theme` em `app/globals.css` + screenshot do starter kit (botões, inputs, cards, modal, tipografia, swatches) gerado via browser subagent.
+
+**Quem trabalha:** designer (se houver) ou eng lead + 1 agente. Browser subagent para validar starter kit.
+
+**Critério de saída:** aprovação visual humana sobre o screenshot do starter kit. Sem isso, nenhuma story de UI da Sprint 01 entra em execução.
+
+**Quando pular:** produto sem UI (CLI, lib, daemon). Mesmo assim, registre a decisão de pular no `_summary.md` da fase para auditoria.
+
+Detalhe completo em [`02b-design/00-design-foundations.md`](02b-design/00-design-foundations.md).
 
 ### 4.3 Spec (fase 03)
 
@@ -511,11 +531,15 @@ Se em algum momento o trabalho começar a parecer mais lento por causa do harnes
 | Você é... | Leia em seguida |
 |-----------|-----------------|
 | Novo no projeto | `README.md` → `AGENTS.md` → `05-execution/00-context-protocol.md` |
-| Vai começar produto novo | `01-discovery/00-discovery-brief.md` |
-| Vai escrever PRD | `02-prd/00-prd-template.md` |
+| Vai começar produto novo | `01-discovery/00-discovery-brief.md` + `01-discovery/02-elicitation-guide.md` |
+| Vai conduzir entrevista de discovery | `01-discovery/02-elicitation-guide.md` |
+| Vai escrever PRD | `02-prd/00-prd-template.md` + `02-prd/01-glossary-template.md` |
+| Vai definir design system | `02b-design/00-design-foundations.md` |
 | Vai desenhar arquitetura | `03-spec/00-tech-spec.md` + `01-adr-template.md` |
 | Vai planejar sprint | `04-sprints/00-sprint-plan.md` + `01-story-template.md` |
-| Vai implementar story | `05-execution/02-nextjs-conventions.md` |
+| Vai implementar story | `05-execution/02-nextjs-conventions.md` + `05-execution/06-plan-artifact-template.md` |
+| Vai mexer em schema/migration | `05-execution/07-migration-checklist.md` |
+| Vai fechar uma fase | `05-execution/05-phase-summary-template.md` |
 | Vai delegar a subagente | `05-execution/01-subagent-delegation.md` |
 | Vai escrever testes | `06-testing/00-testing-strategy.md` |
 | Vai fazer release | `07-deploy/00-deploy-runbook.md` + `01-security-checklist.md` |

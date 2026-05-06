@@ -88,11 +88,12 @@ tests/
 
 Para qualquer modificação:
 
-1. Liste os arquivos que pretende tocar e por quê (Plan Artifact).
-2. Confirme que existe ou crie a story correspondente em `docs/sprints/`.
-3. Verifique se há ADR aplicável em `docs/spec/adr/`. Se a mudança contraria um ADR, **pare** e abra um ADR de substituição.
+1. Liste os arquivos que pretende tocar e por quê — produza um **Plan Artifact** seguindo o template em `harness/05-execution/06-plan-artifact-template.md`. **Pause para aprovação humana antes de tocar código** (Gate 1).
+2. Confirme que existe ou crie a story correspondente em `docs/sprints/<n>/<story-id>.md` (não na raiz de `sprints/`) e que `docs/sprints/<n>/sprint-plan.md` cita esta story.
+3. Verifique se há ADR aplicável em `docs/spec/adr/`. Se a mudança toca **auth / RBAC / billing / PII / schema sensível** e nenhum ADR aplicável existe, **passo 0 do plano = redigir o ADR**. Se a mudança contraria um ADR aceito, **pare** e abra um ADR de substituição.
 4. Rode `pnpm typecheck && pnpm lint` antes de declarar a tarefa pronta.
 5. Para qualquer mudança visual, gere screenshot via browser subagent e anexe ao Artifact.
+6. Para qualquer mudança em schema (migration, RLS, trigger, seed), aplique `harness/05-execution/07-migration-checklist.md` e anexe o resultado ao Final Artifact.
 
 ---
 
