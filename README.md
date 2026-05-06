@@ -13,7 +13,8 @@ End-users invoke the skill via their runtime; they do not browse this repo.
 
 ## What's in this repo
 
-```
+
+```text
 .
 ├── README.md                                  ← this file (maintainer-facing)
 └── agent-product-harness/                     ← the distributable skill
@@ -49,7 +50,7 @@ runtime, place the `agent-product-harness/` folder where that runtime looks for
 skills:
 
 | Runtime | Skill location |
-|---------|----------------|
+| :--- | :--- |
 | Claude Code (user-level) | `~/.claude/skills/agent-product-harness/` |
 | Claude Code (project-level) | `<project>/.claude/skills/agent-product-harness/` |
 | Antigravity | analogous skills directory (Anthropic-format compatible) |
@@ -57,6 +58,32 @@ skills:
 
 The simplest distribution is a **`git clone`** of this repo, or a symlink from
 the runtime's skills directory to `agent-product-harness/`.
+
+---
+
+## Local Installation (Per-Project)
+
+To use this harness in a specific project (local installation), follow these steps:
+
+1. **Clone this repository** to a location of your choice:
+   ```bash
+   git clone git@github.com:Eduardolimacesl/agent-product-harness.git
+   ```
+
+2. **Create the skills directory** in your target project (e.g., for Antigravity):
+
+   ```bash
+   mkdir -p .gemini/antigravity/skills
+   ```
+
+3. **Create a symbolic link (symlink)** from the skill folder to your project:
+
+   ```bash
+   # Replace /path/to/repo with the actual path where you cloned this repo
+   ln -s /path/to/repo/agent-product-harness ./.gemini/antigravity/skills/agent-product-harness
+   ```
+
+This allows you to make changes to this harness repository and see them reflected immediately in your development project.
 
 ---
 
