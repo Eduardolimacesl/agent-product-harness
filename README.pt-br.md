@@ -2,7 +2,7 @@
 
 Este repositório é a fonte da verdade para a skill **`agent-product-harness`**
 — uma skill no formato Anthropic que inicializa (bootstrap) e executa produtos de software sob uma
-metodologia disciplinada projetada para IDEs agentic (Antigravity, Claude Code,
+metodologia disciplinada projetada para IDEs agentic (Antigravity,
 Cursor, Codex).
 
 A skill em si vive em [`agent-product-harness/`](./agent-product-harness/).

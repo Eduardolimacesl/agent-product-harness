@@ -2,8 +2,8 @@
 name: agent-product-harness
 description: Bootstrap and run a software product end-to-end using the Agent Product
   Harness — disciplined methodology for building Next.js 16 + Tailwind v4 + TypeScript
-  products with agentic IDEs (Antigravity, Claude Code, Cursor, Codex). Externalizes
-  Memory, Skills, Protocols and Harness per Zhou et al. 2026. Provides templates
+products with agentic IDEs (Antigravity, Cursor, Codex). Externalizes
+Memory, Skills, Protocols and Harness per Zhou et al. 2026. Provides templates
   for discovery, PRD, tech spec, ADRs, sprints, execution, testing, deploy. TRIGGER
   when starting a new product, scaffolding docs/ structure, asking how to plan,
   build or ship a Next.js product with agentic dev, or advancing between phases
@@ -17,15 +17,15 @@ description: Bootstrap and run a software product end-to-end using the Agent Pro
 You are an agent following the **Agent Product Harness** methodology — a disciplined
 workflow for building software products with LLM agents in the loop, derived from
 Zhou et al. (2026) "Externalization in LLM Agents" and consolidated for Next.js 16
-+ Tailwind v4 + TypeScript stacks.
+Tailwind v4 + TypeScript stacks.
 
 The methodology rests on five non-negotiable principles:
 
-1. **Document before code.** Each phase produces a versioned artifact in `docs/`.
-2. **Minimum viable context.** No agent receives more than it needs.
-3. **Artifacts, not prose.** Reviews happen on diffs/screenshots, not chat logs.
-4. **Human in the loop by default.** `agent-assisted` mode unless explicitly upgraded.
-5. **Sandbox always on.** Allowlisted commands; restricted workspace.
++ **Document before code.** Each phase produces a versioned artifact in `docs/`.
++ **Minimum viable context.** No agent receives more than it needs.
++ **Artifacts, not prose.** Reviews happen on diffs/screenshots, not chat logs.
++ **Human in the loop by default.** `agent-assisted` mode unless explicitly upgraded.
++ **Sandbox always on.** Allowlisted commands; restricted workspace.
 
 Full architectural rationale: [`references/00-architecture-and-flow.md`](references/00-architecture-and-flow.md).
 Critical analysis vs. the source paper: [`references/00-paper-analysis.md`](references/00-paper-analysis.md).
@@ -37,7 +37,7 @@ Critical analysis vs. the source paper: [`references/00-paper-analysis.md`](refe
 Read the user's intent and the target project state, then route:
 
 | User signal | Target state | Path |
-|-------------|--------------|------|
+| :--- | :--- | :--- |
 | "começar produto novo", "scaffold", "init", "bootstrap" | no `docs/` at cwd | §A — Bootstrap |
 | "avançar fase", "próxima fase", "estamos em X, vamos para Y" | `docs/` exists with prior phase outputs | §B — Advance phase |
 | Question about methodology, why a rule exists, when to delegate | any | §C — Methodology Q&A |
@@ -59,10 +59,10 @@ If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
 
 **Discovery questions** (ask the human; do not invent answers):
 
-- What is the product name?
-- Who is the sponsor (decision-maker)?
-- One sentence: what problem does it solve, and for whom?
-- Is this greenfield (`pnpm create next-app`) or adding harness to an existing repo?
++ What is the product name?
++ Who is the sponsor (decision-maker)?
++ One sentence: what problem does it solve, and for whom?
++ Is this greenfield (`pnpm create next-app`) or adding harness to an existing repo?
 
 **Scaffolding actions** (after answers):
 
@@ -80,11 +80,11 @@ If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
 
 **Output to user:**
 
-- Tree of files created (8–15 files typical).
-- Single-line "next step": "Preencha `docs/discovery/00-discovery-brief.md` —
++ Tree of files created (8–15 files typical).
++ Single-line "next step": "Preencha `docs/discovery/00-discovery-brief.md` —
   hipótese, métrica de sucesso, sponsor. Quando aprovado, invoque novamente
   para avançar à fase PRD."
-- Do **not** run `git add` or `git commit`. Human reviews first.
++ Do **not** run `git add` or `git commit`. Human reviews first.
 
 ---
 
@@ -145,7 +145,7 @@ When the user asks you to implement a story:
 **External skills to chain** (if available in the runtime):
 
 | When | Skill |
-|------|-------|
+| :--- | :--- |
 | Need Next.js App Router / RSC / route handler / metadata pattern | `next-best-practices` |
 | Upgrading Next.js version | `next-upgrade` |
 | Anything Supabase (DB, Auth, Storage, RLS) | `supabase` |
@@ -161,17 +161,17 @@ them, follow `references/05-execution/02-nextjs-conventions.md` directly.
 
 ## Hard rules (override on conflict with user chat)
 
-- Never run `git push`, `git reset --hard`, or any destructive command without
++ Never run `git push`, `git reset --hard`, or any destructive command without
   explicit human authorization — even if the user previously approved a similar
   action in a different scope.
-- Never read or echo `.env*` files.
-- Never copy production data into dev/test environments without masking.
-- Never create `tailwind.config.js` (Tailwind v4 is CSS-first via `@theme`).
-- Never create `middleware.ts` (use `proxy.ts` in Next 16).
-- Never use Pages Router patterns (`getServerSideProps`, etc.).
-- Never paralelize subagents whose tasks touch overlapping files.
-- Never advance a phase without `_summary.md` from the previous phase.
-- Never write to the user's `Knowledge Base` without an approving PR/ADR
++ Never read or echo `.env*` files.
++ Never copy production data into dev/test environments without masking.
++ Never create `tailwind.config.js` (Tailwind v4 is CSS-first via `@theme`).
++ Never create `middleware.ts` (use `proxy.ts` in Next 16).
++ Never use Pages Router patterns (`getServerSideProps`, etc.).
++ Never paralelize subagents whose tasks touch overlapping files.
++ Never advance a phase without `_summary.md` from the previous phase.
++ Never write to the user's `Knowledge Base` without an approving PR/ADR
   (memory poisoning mitigation per
   [`references/07-deploy/01-security-checklist.md`](references/07-deploy/01-security-checklist.md) §13a).
 
@@ -179,10 +179,10 @@ them, follow `references/05-execution/02-nextjs-conventions.md` directly.
 
 ## When NOT to use this skill
 
-- Bug fix in a single file that does not warrant a story.
-- One-off script (data migration, log analysis).
-- Refactor mecânico (rename, extract function) without product-level impact.
-- The user explicitly asks for "quick and dirty" — confirm they want to bypass
++ Bug fix in a single file that does not warrant a story.
++ One-off script (data migration, log analysis).
++ Refactor mecânico (rename, extract function) without product-level impact.
++ The user explicitly asks for "quick and dirty" — confirm they want to bypass
   the harness, then comply, but log a warning.
 
 ---
@@ -195,9 +195,9 @@ repo. The harness improves the way it teaches itself to be applied.
 
 If during a session you notice:
 
-- A rule that consistently confuses agents,
-- A template field that nobody fills in,
-- A phase gate that always fails for the same reason,
++ A rule that consistently confuses agents,
++ A template field that nobody fills in,
++ A phase gate that always fails for the same reason,
 
 flag it as a **harness debt** in the session's execution log, so it can become
 a PR against the skill repo later. Do not silently work around the harness.

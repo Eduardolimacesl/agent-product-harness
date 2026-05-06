@@ -13,7 +13,6 @@ End-users invoke the skill via their runtime; they do not browse this repo.
 
 ## What's in this repo
 
-
 ```text
 .
 ├── README.md                                  ← this file (maintainer-facing)
@@ -66,6 +65,7 @@ the runtime's skills directory to `agent-product-harness/`.
 To use this harness in a specific project (local installation), follow these steps:
 
 1. **Clone this repository** to a location of your choice:
+
    ```bash
    git clone git@github.com:Eduardolimacesl/agent-product-harness.git
    ```
