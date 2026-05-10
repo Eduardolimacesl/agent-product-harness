@@ -1,14 +1,35 @@
-# Story `<ID>` — `<Título curto>`
+# Story Template — `docs/sprints/<N>/<story-id>.md`
 
 > Unidade de trabalho da sprint. 1 story = 1 PR (ou conjunto pequeno de PRs).
-> Salvar em `docs/sprints/<sprint-N>/<id>.md`.
+> Salvar em `docs/sprints/<sprint-N>/<id>.md` — **nunca** na raiz de `sprints/`.
+>
+> Frontmatter completo definido em [`../00-conventions.md`](../00-conventions.md) §2.4.
 
-**Tipo:** `story | bug | tech-task | spike | chore`
-**Prioridade:** `P0 | P1 | P2`
-**Tamanho:** `XS | S | M | L`
-**Sprint:** `<N>`
-**Owner:** `<dev>`
-**Status:** `⬜ to do | 🟨 doing | 🟦 review | ✅ done`
+---
+
+## Frontmatter (obrigatório)
+
+```yaml
+---
+id: us-NN-slug                       # us | ts | spike | chore + número + slug
+name: <Title Case>
+type: story                          # story | tech-task | spike | chore
+priority: P0                         # P0 | P1 | P2
+size: M                              # XS | S | M | L
+sprint: <N>
+status: todo                         # todo | doing | review | done
+owner: unassigned
+created: <ISO 8601 UTC>
+updated: <ISO 8601 UTC>
+depends_on: []                       # ["us-01-...", "ts-03-..."]
+parallel: true                       # pode rodar concorrente com não-conflitantes
+conflicts_with: []                   # ["us-04-..."] toca os mesmos arquivos
+adr_refs: []                         # ["0001", "0003"] ADRs aplicáveis
+github:                              # populado pelo 08-github-sync
+---
+```
+
+Validação automática via [`../scripts/validate.sh`](../scripts/validate.sh).
 
 ---
 
@@ -63,7 +84,9 @@ Como <persona>, quero <ação>, para que <benefício>.
 
 ## Plano de implementação (Plan Artifact do agente)
 
-> Preenchido pelo agente **antes** de tocar em código. Aprovado pelo humano.
+> Preenchido pelo agente **antes** de tocar em código. Aprovado pelo humano
+> (Gate 1). Template detalhado em
+> [`../05-execution/06-plan-artifact-template.md`](../05-execution/06-plan-artifact-template.md).
 
 **Arquivos a criar/modificar:**
 
@@ -86,16 +109,17 @@ Como <persona>, quero <ação>, para que <benefício>.
 7. `[ ]` Validar a11y manualmente + axe
 8. `[ ]` Atualizar README do módulo
 
-**Dependências:**
-
-```
-[liste stories ou serviços que precisam estar prontos antes]
-```
+**Dependências entre stories:** declaradas em `depends_on:` no frontmatter.
+O script [`../scripts/next-story.sh`](../scripts/next-story.sh) usa esse campo
+para identificar o que está pronto para começar.
 
 **Subagentes envolvidos:**
 
+- Para stories M+ tocando ≥3 camadas, considere paralelizar produzindo
+  `<story-id>-analysis.md` conforme
+  [`03-story-analysis-template.md`](03-story-analysis-template.md). Sem essa
+  análise, **não** lançar sub-agentes em paralelo.
 - Browser subagent: validar formulário e capturar screenshot do estado de erro.
-- Nenhum agente paralelo recomendado (toca arquivos sobrepostos a outras stories).
 
 ---
 
@@ -115,6 +139,9 @@ Como <persona>, quero <ação>, para que <benefício>.
 [ex: "esta story toca o módulo de auth — revisar com cuidado autorização"]
 ```
 
+> Se a story toca auth/RBAC/billing/PII e `adr_refs:` está vazio, o
+> `validate.sh` recusa. Passo 0 do plano = redigir ADR.
+
 ---
 
 ## Definition of Done para esta story
@@ -126,18 +153,28 @@ Como <persona>, quero <ação>, para que <benefício>.
 - [ ] Telemetria do novo evento configurada
 - [ ] Documentação atualizada
 - [ ] Smoke test em staging
+- [ ] `status: done` no frontmatter; rodou `progress.sh <sprint>`
 
 ---
 
 ## Como instruir o agente
 
 ```
-Trabalhe nesta story <ID>.
+Trabalhe nesta story <id>.
 1. Leia esta página inteira.
-2. Leia AGENTS.md e a Tech Spec.
-3. Antes de qualquer arquivo: gere o Plan Artifact (acima) preenchido e ESPERE minha aprovação.
-4. Após aprovado, implemente passo a passo. Pause após cada passo se houver dúvida.
-5. Rode `pnpm typecheck && pnpm lint && pnpm test:unit` no fim de cada passo.
-6. Para validação visual, invoque o browser subagent e anexe screenshot ao Artifact.
-7. Não rode `git push`. Não toque em arquivos fora da lista do plano sem perguntar.
+2. Leia AGENTS.md, docs/prd/01-glossary.md e a Tech Spec.
+3. Rode bash <skill>/references/scripts/validate.sh — deve sair 0.
+4. Antes de qualquer arquivo: gere o Plan Artifact (acima) preenchido e ESPERE
+   minha aprovação.
+5. Se size ≥ M e a story toca ≥3 camadas, gere também
+   <id>-analysis.md (template em ../04-sprints/03-story-analysis-template.md).
+6. Após aprovado, implemente passo a passo. Pause após cada passo se houver
+   dúvida.
+7. Rode `pnpm typecheck && pnpm lint && pnpm test:unit` no fim de cada passo.
+8. Para validação visual, invoque o browser subagent e anexe screenshot ao
+   Artifact.
+9. Não rode `git push`. Não toque em arquivos fora da lista do plano sem
+   perguntar.
+10. Ao final: status: done + progress.sh + execution log em
+    docs/memory/execution/<YYYY-MM-DD>-<id>.md.
 ```

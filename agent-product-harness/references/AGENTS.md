@@ -34,6 +34,11 @@ pnpm typecheck
 git status
 git diff
 git log
+bash <skill>/references/scripts/validate.sh
+bash <skill>/references/scripts/phase-status.sh
+bash <skill>/references/scripts/sprint-status.sh
+bash <skill>/references/scripts/story-list.sh
+bash <skill>/references/scripts/next-story.sh
 ```
 
 Qualquer outro comando, **pergunte antes**. Especialmente: `rm`, `git push`, `git reset`, scripts de deploy, comandos com `sudo`, `curl | sh`, modificações em `.env*`.
@@ -91,9 +96,10 @@ Para qualquer modificação:
 1. Liste os arquivos que pretende tocar e por quê — produza um **Plan Artifact** seguindo o template em `harness/05-execution/06-plan-artifact-template.md`. **Pause para aprovação humana antes de tocar código** (Gate 1).
 2. Confirme que existe ou crie a story correspondente em `docs/sprints/<n>/<story-id>.md` (não na raiz de `sprints/`) e que `docs/sprints/<n>/sprint-plan.md` cita esta story.
 3. Verifique se há ADR aplicável em `docs/spec/adr/`. Se a mudança toca **auth / RBAC / billing / PII / schema sensível** e nenhum ADR aplicável existe, **passo 0 do plano = redigir o ADR**. Se a mudança contraria um ADR aceito, **pare** e abra um ADR de substituição.
-4. Rode `pnpm typecheck && pnpm lint` antes de declarar a tarefa pronta.
-5. Para qualquer mudança visual, gere screenshot via browser subagent e anexe ao Artifact.
-6. Para qualquer mudança em schema (migration, RLS, trigger, seed), aplique `harness/05-execution/07-migration-checklist.md` e anexe o resultado ao Final Artifact.
+4. Rode `bash <skill>/references/scripts/validate.sh` — deve sair 0. O script pega story em diretório errado, ADR folder ausente, frontmatter inválido, `depends_on` quebrado e domínio sensível sem `adr_refs`.
+5. Rode `pnpm typecheck && pnpm lint` antes de declarar a tarefa pronta.
+6. Para qualquer mudança visual, gere screenshot via browser subagent e anexe ao Artifact.
+7. Para qualquer mudança em schema (migration, RLS, trigger, seed), aplique `harness/05-execution/07-migration-checklist.md` e anexe o resultado ao Final Artifact.
 
 ---
 
@@ -102,12 +108,14 @@ Para qualquer modificação:
 - [ ] `pnpm typecheck` passou
 - [ ] `pnpm lint` passou
 - [ ] `pnpm test:unit` passou
+- [ ] `bash <skill>/references/scripts/validate.sh` saiu 0
 - [ ] Mensagem de commit segue Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`)
 - [ ] Diff revisado pelo humano via Artifact
 - [ ] Sem `console.log` esquecido (use `lib/logger`)
 - [ ] Sem secret hardcoded
 - [ ] Se mudou rota pública: verificou impacto em SEO/sitemap
 - [ ] Se mudou schema: criou migration
+- [ ] Se fechou story: rodou `progress.sh <sprint>` e atualizou `status: done`
 
 **Nunca** rode `git push` sem aprovação humana explícita.
 
@@ -149,6 +157,7 @@ Pare e pergunte se:
 - O **browser subagent** é o canal correto para validar UI. Use-o para smoke tests visuais e capturar evidências.
 - Para tarefas paralelizáveis e ortogonais (ex.: testes E2E vs. refino de UI), use o **Agent Manager** com workspaces separados.
 - Para tarefas sequenciais dentro de uma única story, mantenha um único agente — paralelizar só gera conflito.
+- Para uma story M+ que toca ≥3 camadas, paralelize via streams declarados em `<story-id>-analysis.md` — protocolo em `harness/05-execution/09-parallel-streams.md`. Sem esse arquivo, **não** lance sub-agentes em paralelo.
 - Detalhes em `harness/05-execution/01-subagent-delegation.md`.
 
 ---
@@ -179,6 +188,14 @@ Padrões procedimentais específicos deste produto que se repetem entre stories.
 
 Quando criar skill interna: o mesmo padrão apareceu em ≥ 3 stories e não está coberto por skill externa.
 
+### 11.3 Scripts (operações determinísticas)
+
+Nem tudo precisa de LLM. O harness fornece scripts bash para leitura/validação em `harness/references/scripts/` — catálogo em `references/scripts/README.md`. Use-os antes de pedir o agente para "contar stories" ou "verificar se está tudo certo":
+
+- `validate.sh` — gates do harness (estrutura, frontmatter, deps).
+- `phase-status.sh`, `sprint-status.sh`, `story-list.sh`, `next-story.sh` — leitura.
+- `progress.sh <N>` — recalcula `progress:` do sprint.
+
 ---
 
 ## 12. Protocolos
@@ -188,6 +205,7 @@ Tudo que cruza fronteira de processo (agente ↔ tool, agente ↔ serviço, serv
 - **MCP servers** entram via registry `mcp/registry.json` + ADR. Nunca instale ad hoc.
 - **Server Actions** seguem contrato tipado (Zod + retorno discriminado `{ ok: true } | { ok: false, code }`).
 - **Webhooks** validam HMAC + timestamp + idempotência **antes** de processar payload.
+- **GitHub sync** (opcional): bridge `docs/` ↔ Issues/PRs em `harness/05-execution/08-github-sync.md`. Não sincroniza `docs/memory/execution/` nem `discovery/`.
 - **A2A** e **AG-UI**: hoje fora de escopo. Não implementar sem ADR.
 
 ---
