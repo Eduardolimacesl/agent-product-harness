@@ -63,6 +63,10 @@ flowchart LR
 ## 4. Modelo de domínio
 
 > Entidades principais e relações. Diagrama + dicionário.
+>
+> **Para produtos com domínio não-trivial** (≥ 2 entidades com regras, ≥ 2 áreas de negócio, ou ≥ 1 invariante), o modelo de domínio detalhado (Bounded Contexts, Aggregate Roots, Value Objects, Domain Events, máquinas de estado) vive em [`02-domain-model.md`](02-domain-model.md). Esta seção fica como **resumo executivo do domínio** — diagrama ER + dicionário de entidades persistidas. Não duplique o conteúdo do `02-domain-model.md`.
+>
+> Para produtos puramente CRUD, declare aqui explicitamente: *"Domínio CRUD; sem `02-domain-model.md` por decisão consciente."*
 
 ```mermaid
 erDiagram
@@ -139,6 +143,68 @@ export async function createInspection(input: unknown) {
 | Endpoint | Método | Auth | Idempotência |
 |----------|--------|------|--------------|
 | `/api/webhooks/<x>` | POST | HMAC | sim, via `event_id` |
+
+### 6.4 Contratos como código (Spec-Driven Development)
+
+Os contratos das seções 6.2 e 6.3 **não vivem só nesta Spec**. Cada um é declarado uma única vez em código e referenciado tanto pela implementação quanto pelos testes. Isso fecha a malha entre spec e código — a Spec sempre reflete o que está rodando, ou a CI falha.
+
+**Regra:** todo Server Action, webhook e Domain Event publicado tem um schema declarado em `src/contracts/` (ou `lib/contracts/` na Variante A) e nomeado conforme tabela abaixo.
+
+| Tipo de contrato | Local canônico | Importado por |
+|------------------|----------------|----------------|
+| Input de Server Action | `src/contracts/<contexto>/<action>.input.ts` (Zod) | a própria action + testes (unit + integration) + Tech Spec |
+| Output de Server Action | `src/contracts/<contexto>/<action>.output.ts` (Zod union `{ ok, ... }`) | mesma |
+| Payload de webhook recebido | `src/contracts/webhooks/<provider>.<event>.ts` | route handler + teste de integração |
+| Domain Event publicado | `src/contracts/events/<context>.<event>.v1.ts` (JSON Schema ou Zod) | publisher + consumer + analytics + dashboard |
+
+**Exemplo (Variante A):**
+
+```ts
+// lib/contracts/inspections/create-inspection.input.ts
+import { z } from 'zod';
+
+export const CreateInspectionInput = z.object({
+  buildingId: z.string().uuid(),
+  notes: z.string().max(2000).optional(),
+});
+export type CreateInspectionInput = z.infer<typeof CreateInspectionInput>;
+```
+
+```ts
+// app/(app)/inspections/actions.ts
+'use server';
+import { CreateInspectionInput } from '@/lib/contracts/inspections/create-inspection.input';
+
+export async function createInspection(input: unknown) {
+  const parsed = CreateInspectionInput.safeParse(input);
+  // ...
+}
+```
+
+```ts
+// tests/unit/contracts/inspections/create-inspection.input.test.ts
+import { CreateInspectionInput } from '@/lib/contracts/inspections/create-inspection.input';
+// teste valida casos válidos/inválidos sem importar a action
+```
+
+**Critérios de aceite executáveis:** sempre que possível, todo Given/When/Then **P0** do PRD vira **um teste E2E nomeado pelo ID da story**:
+
+```ts
+// tests/e2e/inspections.spec.ts
+test('US-02 / AC-1: inspetor cria inspeção fim-a-fim', async ({ page }) => {
+  // espelha o Given/When/Then literalmente
+});
+```
+
+> Sem ferramenta extra (Cucumber/Gherkin). Usa o que já está no stack (Zod + Playwright).
+
+**Drift detection.** O script [`../scripts/check-spec-drift.sh`](../scripts/check-spec-drift.sh) compara:
+
+- Server Actions listadas em §6.2 vs. arquivos `export async function` em `app/.../actions.ts` (Variante A) ou `src/interface/web/app/.../actions.ts` (Variante B).
+- Domain Events listados em [`02-domain-model.md`](02-domain-model.md) §3.1.4 vs. arquivos em `src/domain/<contexto>/events/` ou `src/contracts/events/`.
+- Webhooks listados em §6.3 vs. route handlers em `app/api/webhooks/`.
+
+Falha se: contrato listado na Spec sem arquivo correspondente, ou arquivo de contrato sem entrada na Spec. Gate do `validate.sh` no PR final.
 
 ---
 

@@ -144,6 +144,15 @@ that is missing. The harness's value is the gate, not the speed.
   + 1 anti-evidence + metric with baseline — see
   [`references/01-discovery/02-elicitation-guide.md`](references/01-discovery/02-elicitation-guide.md)
   §"Critério de pronto para PRD").
++ **PRD → Spec specifically:** Ubiquitous Language reconciled in
+  `docs/prd/01-glossary.md` (every domain term has a code-reflex column
+  filled, or marked `🟡 a definir na Spec`). If the product has a
+  non-trivial domain (≥ 2 entities with rules, ≥ 2 business areas, or
+  ≥ 1 invariant), Spec must include `docs/spec/02-domain-model.md` with
+  at least 1 Bounded Context defined and tactical blocks for the Core
+  subdomain. Pure-CRUD products may skip the file with an explicit
+  declaration in `00-tech-spec.md` §4. See
+  [`references/03-spec/02-domain-model.md`](references/03-spec/02-domain-model.md).
 + If the previous phase produced ADRs (Spec, Design Foundations) and none
   exist in `docs/spec/adr/`, require explicit justification in `_summary.md`.
 + `bash <skill>/references/scripts/validate.sh` exits 0.
