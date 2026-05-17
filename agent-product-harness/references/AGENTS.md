@@ -87,6 +87,23 @@ tests/
 6. **Acessibilidade:** componentes interativos com role/aria correto, foco visível, contraste AA mínimo.
 7. **Mensagens em UI:** centralizar em `lib/i18n` (mesmo que apenas pt-BR no início).
 
+### Clean Code (regras objetivas, checadas no review)
+
+Estes itens são verificáveis em diff. Em conflito com "estilo pessoal", **prevalece a regra**. Quando uma regra prejudicar legibilidade num caso concreto, abra exceção justificada no PR — não silencie.
+
+1. **Função > 30 linhas → refatorar.** Limite é instrumental, não dogma. Se passar, extraia método ou questione se faz coisa demais.
+2. **Argumento booleano em método público = flag de design.** Quebre em dois métodos com nomes que expressem a intenção (`activate()` / `deactivate()` em vez de `setActive(boolean)`).
+3. **Command-Query Separation.** Função ou retorna valor (query) ou muda estado (command). Nunca as duas. Getter com efeito colateral é bug latente.
+4. **Sem números/strings mágicos.** Constantes nomeadas no vocabulário do domínio (`MAX_INSPECTIONS_PER_DAY`, `STATUS_DRAFT`). Strings de status nunca repetidas — vire enum ou union de literais.
+5. **Early-return preferido a `else` aninhado.** Guard clauses no topo; happy path desindentado no final.
+6. **Comentário só explica "por quê", nunca "o quê".** Se você sente que precisa comentar o que o código faz, renomeie variáveis/funções até o código se explicar.
+7. **Nomes longos > nomes curtos enigmáticos.** `inspectionsAwaitingReview` vence `iAR`. Mas evite redundância: `inspectionList: Inspection[]` é ruim — `inspections: Inspection[]` basta.
+8. **Primitivo obsessivo → Value Object.** Se `string` representa CPF, e-mail, slug ou moeda, vire `CPF`, `Email`, `Slug`, `Money` com construtor que valida na borda. Type alias não conta — precisa ser tipo nominal (branded type ou class).
+9. **DRY com cabeça.** Duas ocorrências do mesmo padrão → tolere. Três → extraia. Premature abstraction é pior que duplicação.
+10. **Erro é dado, não controle de fluxo.** Use `Result<T, E>` / `{ ok, value | error }` para erros esperados (validação, regra de negócio). `throw` só para inesperados (programação, infra). Server Actions retornam discriminated union (já obrigatório em §3 das convenções).
+
+> Antes de pedir review humano, invoque a skill `clean-code-pass` (manifesto em `skills/clean-code-pass/SKILL.md`) — ela roda essas 10 regras como checklist sobre o diff e reporta violações antes do humano olhar.
+
 ---
 
 ## 5. Antes de modificar código

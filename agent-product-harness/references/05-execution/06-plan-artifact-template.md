@@ -62,9 +62,23 @@ Para tarefas menores (1-2 arquivos, refactor mecânico, fix isolado), o Plan Art
 
 > Sequência lógica. Cada passo termina em verificação (typecheck/lint/test/screenshot).
 
-1. <passo 1> — verificação: <comando ou critério>
-2. <passo 2> — verificação: <...>
-3. ...
+**Regra TDD (obrigatória para arquivos em `src/domain/**` ou `src/application/**`):** cada passo que cria/altera código nessas camadas é dividido em três subpassos explícitos:
+
+- `red`: escrever (ou alterar) o teste que falha — rodar para confirmar que falha **pelo motivo certo**.
+- `green`: implementar o mínimo para o teste passar.
+- `refactor`: melhorar nomes/estrutura sem quebrar teste; rodar a suíte ao final.
+
+Para código em `app/`, `components/`, `lib/utils`, infra (`src/infrastructure/**`) e integrações com APIs externas instáveis, **test-after é aceitável** — mas o passo de teste continua obrigatório antes do commit.
+
+Exemplo:
+
+1. `[red]` Adicionar caso "rejeita notes > 2000 chars" em `tests/unit/domain/inspections/inspection.test.ts` — verificação: `pnpm test:unit -- inspection` falha com mensagem esperada.
+2. `[green]` Implementar invariante em `src/domain/inspections/inspection.ts` — verificação: mesmo comando passa.
+3. `[refactor]` Extrair `MAX_NOTES_LENGTH` como constante de domínio — verificação: suíte continua verde + typecheck.
+4. `[test-after]` Adicionar Server Action `createInspection` em `app/(app)/inspections/actions.ts` — verificação: `pnpm typecheck && pnpm lint && pnpm test:integration`.
+5. ...
+
+Se um passo de domínio/aplicação **não** segue red-green-refactor, justifique no próprio passo (`[no-tdd: <razão>]`) — humano avalia no Gate 2.
 
 ## 5. Subagentes necessários
 
@@ -127,6 +141,7 @@ O agente revisa **antes** de pedir aprovação:
 - [ ] **ADRs aplicáveis** listados. Se domínio sensível e não há ADR → passo 0 = redigir ADR.
 - [ ] **Riscos** ≥ 1 listado com mitigação concreta. "Sem riscos" é quase sempre falso.
 - [ ] **Escopo negativo** explícito (seção 9).
+- [ ] **TDD aplicado** a todo passo que toca `src/domain/**` ou `src/application/**` (red-green-refactor). Exceções marcadas como `[no-tdd: <razão>]`.
 
 Se algum desses bate como vazio sem justificativa, o agente **refaz o plano** antes de mandar para gate.
 
