@@ -1,10 +1,22 @@
-# Glossary Template — `docs/prd/01-glossary.md`
+# Glossary Template — `docs/prd/01-glossary.md` (Ubiquitous Language)
 
-> Vocabulário canônico do produto. **Carregado no bootstrap mínimo** de toda sessão de execução (veja [`SKILL.md`](../../SKILL.md) §D).
+> **Vocabulário canônico do produto** — em terminologia DDD, esta é a **Linguagem Ubíqua** (Ubiquitous Language) do(s) Bounded Context(s) ativos. Mesmas palavras no PRD, no chat com sponsor, nos critérios de aceite, **e** no código (entidade, campo, evento, papel).
+>
+> **Carregado no bootstrap mínimo** de toda sessão de execução (veja [`SKILL.md`](../../SKILL.md) §D).
 
-A fase PRD é onde o vocabulário operacional do domínio é fixado. Sem glossário, cada nova sessão reconstrói termos do zero — e o agente inevitavelmente colide com o usuário ("DT" significa coisas diferentes em discovery e em código).
+A fase PRD é onde a linguagem ubíqua é fixada. Sem ela, cada nova sessão reconstrói termos do zero — e o agente inevitavelmente colide com o usuário ("DT" significa coisas diferentes em discovery e em código).
 
-> Personas vivem no PRD §3. **Glossário é diferente:** termos operacionais, siglas, status, papéis técnicos do domínio. O cruzamento PRD ↔ Spec ↔ Stories só funciona se este arquivo é canônico.
+> Personas vivem no PRD §3. **Glossário é diferente:** termos operacionais, siglas, status, papéis técnicos do domínio, **eventos de negócio**. O cruzamento PRD ↔ Spec ↔ Stories ↔ código só funciona se este arquivo é canônico.
+
+---
+
+## Regra de ouro (DDD)
+
+> **Termo só entra aqui se aparece — ou vai aparecer — no código.**
+
+Se um termo é só de marketing ou copy interno sem reflexo em entidade/campo/status/evento/papel, ele **não** pertence à linguagem ubíqua: vive no PRD §10 (copy) ou na Knowledge Base. Misturar copy com linguagem ubíqua polui o glossário e perde a função de contrato PRD ↔ código.
+
+Critério prático: para cada termo, responda **onde ele aparece (ou vai aparecer) no código?** — nome de classe, campo de tabela, valor de enum, nome de evento, rota, role. Se não houver resposta concreta, não é linguagem ubíqua.
 
 ---
 
@@ -63,15 +75,18 @@ A fase PRD é onde o vocabulário operacional do domínio é fixado. Sem glossá
 
 Em quase todo produto, o glossário inclui pelo menos:
 
-| Categoria | Exemplos |
-|-----------|----------|
-| **Papéis de usuário** | admin, coordenador, operador, viewer |
-| **Status de domínio** | rascunho, em análise, aprovado, arquivado |
-| **Entidades-chave** | inspeção, ordem, projeto, cliente |
-| **Siglas operacionais** | DT, DA, FAB, SLA, NPS — formas extensas e contexto |
-| **Termos técnicos com sentido específico** | "whitelist" significa o quê **neste produto**? |
-| **Métricas de produto** | DAU, retenção D7, ativação |
-| **Ambientes** | dev, staging, sandbox, prod — qual URL, qual dado |
+| Categoria | Exemplos | Reflexo típico no código |
+|-----------|----------|--------------------------|
+| **Papéis de usuário** | admin, coordenador, operador, viewer | enum `Role`, coluna `users.role`, função `requireRole()` |
+| **Status de domínio** | rascunho, em análise, aprovado, arquivado | union de literais `Status`, coluna `<entidade>.status` |
+| **Entidades-chave** | inspeção, ordem, projeto, cliente | classe/tabela `Inspection`, `Order`, `Project`, `Customer` |
+| **Eventos de negócio** | "Inspeção concluída", "Pagamento aprovado" | classe `InspectionCompleted`, `PaymentApproved` em `src/domain/<contexto>/events/` |
+| **Siglas operacionais** | DT, DA, FAB, SLA, NPS — formas extensas e contexto | constantes, campos de relatório |
+| **Termos técnicos com sentido específico** | "whitelist" significa o quê **neste produto**? | tabela `whitelist`, função `isWhitelisted()` |
+| **Métricas de produto** | DAU, retenção D7, ativação | views/queries de analytics, eventos de telemetria |
+| **Ambientes** | dev, staging, sandbox, prod — qual URL, qual dado | `process.env.APP_ENV`, blocos de config |
+
+> **Eventos de negócio** entram no glossário porque, em DDD, eles são contrato observável entre subdomínios. Se Sprint 03 adicionar um consumer de "Inspeção concluída", o nome do evento e seu payload precisam estar fixados antes — não inventados no momento de codar.
 
 ---
 
@@ -82,7 +97,9 @@ O glossário está em estado aceitável para gate de PRD quando:
 - [ ] Todo termo de domínio que aparece no PRD tem entrada.
 - [ ] Toda sigla usada está expandida pelo menos uma vez.
 - [ ] Papéis e status estão **enumerados** (não "etc.").
+- [ ] **Cada entrada cita pelo menos um reflexo no código** (classe, tabela, campo, enum, evento, rota, role) — ou marca `🟡 reflexo a definir na Spec`.
 - [ ] Nenhuma entrada diz "ver discovery" ou "TBD" — ou está definido, ou está marcado `🟡 a definir antes de Spec`.
+- [ ] **Mesmo termo, mesma grafia no PRD, no código e nos critérios de aceite das stories.** Variações ("usuário" vs "operador" vs "user") tratadas como bug de linguagem ubíqua: consolidar antes do gate.
 
 ---
 
@@ -121,3 +138,6 @@ O glossário está em estado aceitável para gate de PRD quando:
 - ❌ Mesmo termo com 2 entradas. → consolide.
 - ❌ Glossário só com siglas, sem papéis/status/entidades. → metade do problema persiste.
 - ❌ Não atualizar quando o domínio muda. → glossário desatualizado é pior que ausência: agente confia, e erra.
+- ❌ **Termo no glossário sem reflexo no código.** → é copy ou marketing; mude de lugar (PRD §10 ou Knowledge Base).
+- ❌ **Termo no código sem entrada no glossário.** → linguagem ubíqua quebrada. Adicione a entrada ou renomeie no código para um termo que já existe.
+- ❌ **Tradução silenciosa** (PRD diz "operador", código diz `worker`). → escolha um lado, fixe no glossário, renomeie o outro. Toda tradução acumula bug de comunicação.

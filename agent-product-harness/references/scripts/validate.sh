@@ -3,16 +3,19 @@
 # Sai 0 se tudo OK, 1 se há falhas.
 #
 # O que checa:
-# 1. docs/ existe
-# 2. docs/spec/adr/ existe (mesmo que vazio)
-# 3. docs/prd/01-glossary.md existe (após bootstrap)
-# 4. nenhuma story na raiz de docs/sprints/
-# 5. cada subpasta de docs/sprints/<N>/ tem sprint-plan.md
-# 6. para cada fase em memory/, _summary.md existe e tem conteúdo
-# 7. frontmatter de stories tem campos obrigatórios
-# 8. depends_on / conflicts_with referenciam stories existentes
-# 9. stories sensíveis (auth/billing/PII) têm adr_refs
+#  1. docs/ existe
+#  2. docs/spec/adr/ existe (mesmo que vazio)
+#  3. docs/prd/01-glossary.md existe (após bootstrap)
+#  4. nenhuma story na raiz de docs/sprints/
+#  5. cada subpasta de docs/sprints/<N>/ tem sprint-plan.md
+#  6. para cada fase em memory/, _summary.md existe e tem conteúdo
+#  7. frontmatter de stories tem campos obrigatórios
+#  8. depends_on / conflicts_with referenciam stories existentes
+#  9. stories sensíveis (auth/billing/PII) têm adr_refs
 # 10. ADRs em docs/spec/adr/ seguem padrão NNNN-slug.md
+# 11. TDD: arquivos em src/domain/** ou src/application/** têm teste
+#     correspondente em tests/unit/ (warning, não fail — só se o projeto
+#     adotou o layout Clean Arch).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=_lib.sh
@@ -138,6 +141,39 @@ if [[ -d docs/spec/adr ]]; then
       fail_check "ADR $adr fora do padrão NNNN-slug.md"
     fi
   done < <(find docs/spec/adr -maxdepth 1 -name '*.md' 2>/dev/null)
+fi
+
+# 11. TDD: arquivos em src/domain/** ou src/application/** devem ter teste
+# correspondente em tests/unit/<mesmo-caminho-relativo>/. Apenas warn — não fail.
+# Só roda se o projeto adotou o layout Clean Arch (src/domain ou src/application).
+if [[ -d src/domain || -d src/application ]]; then
+  TDD_GAPS=0
+  while IFS= read -r src_file; do
+    [[ -z "$src_file" ]] && continue
+    # Ignora index.ts puro de re-export
+    if [[ "$(basename "$src_file")" == "index.ts" ]] \
+       && ! grep -qE '^(export (function|class|const)|class |function )' "$src_file"; then
+      continue
+    fi
+    rel="${src_file#src/}"                # ex: domain/inspections/inspection.ts
+    base="${rel%.ts}"                     # ex: domain/inspections/inspection
+    test_candidates=(
+      "tests/unit/${base}.test.ts"
+      "tests/unit/${base}.spec.ts"
+    )
+    found=0
+    for t in "${test_candidates[@]}"; do
+      [[ -f "$t" ]] && { found=1; break; }
+    done
+    if [[ $found -eq 0 ]]; then
+      warn "TDD gap: $src_file sem teste em tests/unit/${base}.{test,spec}.ts"
+      TDD_GAPS=$((TDD_GAPS + 1))
+    fi
+  done < <(find src/domain src/application -type f -name '*.ts' \
+           ! -name '*.test.ts' ! -name '*.spec.ts' 2>/dev/null)
+  if [[ $TDD_GAPS -eq 0 ]]; then
+    ok "TDD: todo arquivo de domain/application tem teste correspondente"
+  fi
 fi
 
 echo

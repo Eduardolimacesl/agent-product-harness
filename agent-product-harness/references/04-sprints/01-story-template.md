@@ -149,6 +149,7 @@ para identificar o que está pronto para começar.
 - [ ] Todos AC verdes com evidência (screenshot/gif/log)
 - [ ] Migrations aplicadas em staging
 - [ ] Testes adicionados e passando
+- [ ] **TDD respeitado** para arquivos em `src/domain/**` e `src/application/**`: histórico da branch mostra commit do teste **antes** do commit da implementação, ou ambos no mesmo commit com o teste claramente anterior na ordem do diff. Exceções declaradas no Plan Artifact como `[no-tdd: <razão>]`.
 - [ ] PR aprovado
 - [ ] Telemetria do novo evento configurada
 - [ ] Documentação atualizada
