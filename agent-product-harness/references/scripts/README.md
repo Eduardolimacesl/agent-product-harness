@@ -42,6 +42,7 @@ aph/validate.sh
 |--------|-----------|------------|
 | `help.sh` | Lista todos os scripts disponíveis. | — |
 | `validate.sh` | Checa convenções e gates do harness. Sai 0/1. | — |
+| `check-spec-drift.sh` | Detecta drift entre Tech Spec / Domain Model e o código de contratos (Server Actions, Domain Events, Webhooks). Lê ADR-0001 para detectar variante de layout. Sai 0/1/2. | — |
 | `phase-status.sh` | Mostra qual fase está concluída e qual é a próxima. | — |
 | `sprint-status.sh` | Resumo de stories por status na sprint. | `<sprint-N>?` |
 | `story-list.sh` | Lista stories com badges. | `<sprint-N>?` |

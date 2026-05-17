@@ -535,6 +535,7 @@ Se em algum momento o trabalho começar a parecer mais lento por causa do harnes
 | Vai conduzir entrevista de discovery | `01-discovery/02-elicitation-guide.md` |
 | Vai escrever PRD | `02-prd/00-prd-template.md` + `02-prd/01-glossary-template.md` |
 | Vai definir design system | `02b-design/00-design-foundations.md` |
+| Vai modelar domínio (DDD tático) | `03-spec/02-domain-model.md` (pré-requisito: `02-prd/01-glossary-template.md`) |
 | Vai desenhar arquitetura | `03-spec/00-tech-spec.md` + `01-adr-template.md` |
 | Vai planejar sprint | `04-sprints/00-sprint-plan.md` + `01-story-template.md` |
 | Vai implementar story | `05-execution/02-nextjs-conventions.md` + `05-execution/06-plan-artifact-template.md` |

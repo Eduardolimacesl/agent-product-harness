@@ -34,6 +34,10 @@ O `create-next-app` 16.2 já gera um `AGENTS.md` inicial. **Substitua-o** pelo `
 
 ## 3. Estrutura de pastas
 
+> **Antes de ler:** a estrutura abaixo é a **Variante A (Next.js-idiomática)**, padrão deste harness. Produtos que adotaram a **Variante B (em camadas / Clean Architecture)** via ADR-0001 leem esta seção com tradução mental: `app/` ↔ `src/interface/web/app/`, `lib/db/` ↔ `src/infrastructure/db/`, lógica de Server Actions ↔ thin controller chamando `src/application/`. Referência completa da escolha em [`../03-spec/03-architecture-layout.md`](../03-spec/03-architecture-layout.md). Em conflito entre este arquivo e o ADR-0001 do produto, **o ADR prevalece**.
+
+### 3.1 Variante A — leiaute idiomático (default)
+
 ```
 app/
   layout.tsx                  ← root layout
