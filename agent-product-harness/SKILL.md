@@ -83,6 +83,8 @@ If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
      [`references/04-sprints/00-sprint-plan.md`](references/04-sprints/00-sprint-plan.md))
      — **not** just an empty folder.
    + `docs/memory/{discovery,prd,design,spec,sprints,execution,testing,deploys}/.gitkeep`.
+   + `docs/memory/telemetry.jsonl` (empty file — deep telemetry; see
+     [`references/05-execution/11-telemetry-protocol.md`](references/05-execution/11-telemetry-protocol.md)).
    + `docs/runbooks/`.
 3. Create `<cwd>/skills/README.md` (empty product-internal skill registry).
 4. Create `<cwd>/mcp/registry.json` (empty MCP server registry).
@@ -244,6 +246,19 @@ Before loading the story:
     progress percentage.
 11. End the session.
 
+**Telemetry emission** — these events fire as side-effects of the steps
+above (not separate steps). See
+[`references/05-execution/11-telemetry-protocol.md`](references/05-execution/11-telemetry-protocol.md).
+
+| Step | Event |
+| :--- | :--- |
+| 4 (Plan Artifact submitted) | `plan_submitted` |
+| 4 (human approves / rejects) | `plan_approved` or `plan_rejected` |
+| 5 (typecheck/lint/test/e2e fails) | `gate_failed` |
+| 3 or 5 (subagent started) | `subagent_dispatched` |
+| 8 (Gate 2 fix requested) | `human_intervention` |
+| 10 (`status: done`) | `story_closed` |
+
 **External skills to chain** (if available in the runtime):
 
 | When | Skill |
@@ -329,6 +344,9 @@ silent workarounds are a Hard rule violation.
 5. Wait for human decision: (A) fix Spec + retroactive ADR, (B) edit
    the story, or (C) cancel. The story does not exit
    `blocked-spec-drift` without a recorded decision.
+
+The drift detection in step 3 emits `spec_drift_detected` to telemetry
+(see [`references/05-execution/11-telemetry-protocol.md`](references/05-execution/11-telemetry-protocol.md)).
 
 Full protocol: [`references/04-sprints/04-spec-drift-protocol.md`](references/04-sprints/04-spec-drift-protocol.md).
 

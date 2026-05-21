@@ -498,6 +498,16 @@ Cada gate do pipeline corresponde a uma garantia que o harness promete:
 
 Se um gate falha, o agente **não pode** declarar a tarefa pronta. O humano **não pode** mergear. Não há atalho.
 
+**Deep telemetry** (Ning et al. 2026, §3.5.1) é o substrato de
+observabilidade do próprio harness. Eventos estruturados em
+[`docs/memory/telemetry.jsonl`](05-execution/11-telemetry-protocol.md) —
+plan_submitted, plan_rejected, gate_failed, story_closed, etc. — alimentam
+métricas agregáveis (taxa de plan-rejection, tempo Plan→Diff, distribuição
+de falhas por gate). Sem isso, a revisão do harness é *anecdotal
+debugging*; com isso, vira *comparative diagnosis*. Coexiste com o log
+narrativo `docs/memory/execution/*.md` (que é para humanos lerem); a
+telemetria é para agregar.
+
 ---
 
 ## 11. O que cada papel faz no harness

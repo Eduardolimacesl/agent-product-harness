@@ -144,6 +144,32 @@ while IFS= read -r f; do
   fi
 done < <(story_files)
 
+# 9a. Telemetry JSONL well-formedness — every non-blank line must parse.
+TELEM_FILES=$(find docs/memory -maxdepth 1 -name 'telemetry*.jsonl' 2>/dev/null || true)
+while IFS= read -r tf; do
+  [[ -z "$tf" ]] && continue
+  if command -v jq >/dev/null 2>&1; then
+    BAD=$(grep -nv '^[[:space:]]*$' "$tf" | while IFS=: read -r ln rest; do
+      if ! echo "$rest" | jq -e . >/dev/null 2>&1; then
+        echo "L$ln"
+      fi
+    done)
+    if [[ -n "$BAD" ]]; then
+      fail_check "$tf tem linhas não-JSON: $(echo "$BAD" | tr '\n' ' ')"
+    else
+      ok "$tf é JSONL válido"
+    fi
+  else
+    # Minimal check: every non-empty line starts with { and ends with }
+    BAD=$(awk 'NF > 0 && !(/^\{.*\}$/) { printf "L%d ", NR }' "$tf")
+    if [[ -n "$BAD" ]]; then
+      fail_check "$tf tem linhas suspeitas (sem jq disponível): $BAD"
+    else
+      ok "$tf parece JSONL válido (sem jq)"
+    fi
+  fi
+done <<<"$TELEM_FILES"
+
 # 9b. Tech Spec heading uniqueness (precondition for spec-fetch.sh).
 if [[ -f docs/spec/00-tech-spec.md ]]; then
   DUPES=$(grep -E '^#{1,6}[[:space:]]+' docs/spec/00-tech-spec.md \

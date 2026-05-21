@@ -39,7 +39,8 @@ docs/
 │   ├── sprints/_summary.md
 │   ├── execution/<YYYY-MM-DD>-<story-id>.md
 │   ├── testing/_summary.md
-│   └── deploys/_summary.md
+│   ├── deploys/_summary.md
+│   └── telemetry.jsonl                 # deep telemetry, ver 05-execution/11-*
 └── runbooks/
 ```
 
