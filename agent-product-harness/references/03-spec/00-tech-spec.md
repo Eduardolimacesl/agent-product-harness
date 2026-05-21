@@ -10,6 +10,68 @@
 
 ---
 
+## 0. Implementation Blueprint — 5 seções canônicas
+
+> Toda Tech Spec é, em essência, um **Implementation Blueprint** com cinco
+> seções obrigatórias (Li et al. 2025, DeepCode §2.1). As §§1–15 abaixo são
+> o detalhe; este §0 é o índice canônico que o agente lê primeiro.
+
+### B1. Project File Hierarchy
+
+- **Propósito:** árvore de diretórios e arquivos do produto, com função de cada um.
+- **Pronto quando:** `tree` esperado anexo, com ≥1 frase por pasta de topo.
+- **Exemplo:**
+  ```
+  app/(app)/inspections/  → rotas e Server Actions de inspeção
+  src/contracts/          → schemas Zod compartilhados (SDD)
+  src/domain/             → entidades, value objects, eventos
+  ```
+- **Vive em:** §2 (Arquitetura) + §5 (Schema) + §14 (Faseamento técnico).
+
+### B2. Component Specification
+
+- **Propósito:** cada componente — sua responsabilidade, contrato (input/output) e dependências.
+- **Pronto quando:** toda Server Action, webhook e Domain Event publicado tem schema declarado em `src/contracts/`.
+- **Exemplo:**
+  ```
+  createInspection → input: CreateInspectionInput (Zod) · output: { ok: true, id } | { ok: false, error }
+  ```
+- **Vive em:** §2 (componentes) + §6 (contratos) + §8 (auth).
+
+### B3. Verification Protocol
+
+- **Propósito:** o que define "pronto" — testes, gates de CI, budgets.
+- **Pronto quando:** todo P0 Given/When/Then do PRD tem ≥1 teste E2E nomeado pela story.
+- **Exemplo:**
+  ```
+  typecheck → lint → unit → integration → e2e → lighthouse → security
+  ```
+- **Vive em:** §10 (perf) + §11 (segurança) + §12 (testes).
+
+### B4. Execution Environment
+
+- **Propósito:** como o produto roda — runtime, deps, infra, caching, observabilidade.
+- **Pronto quando:** `pnpm install && pnpm dev` em máquina limpa reproduz o ambiente.
+- **Exemplo:**
+  ```
+  Node 22 LTS · pnpm 9 · Postgres 16 · Redis 7 · Vercel + Neon · OTel → Grafana
+  ```
+- **Vive em:** §1 (resumo) + §7 (caching) + §9 (observabilidade).
+
+### B5. Staged Development Plan
+
+- **Propósito:** ordem em que o produto é construído — fases técnicas com critério de "pronto" por fase.
+- **Pronto quando:** fases mapeadas a sprints; cada uma com gate objetivo.
+- **Exemplo:**
+  ```
+  Fase 1 (Skeleton + auth) → CI verde + login E2E
+  Fase 2 (Domínio core)    → CRUD + cobertura ≥ meta
+  ```
+- **Vive em:** §14 (Faseamento técnico) — versão alto-nível.
+  O `04-sprints/00-sprint-plan.md` é a decomposição executável.
+
+---
+
 ## 1. Resumo executivo técnico
 
 > 5 linhas. Stack, padrão arquitetural, decisões cruciais.

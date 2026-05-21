@@ -210,6 +210,8 @@ Detalhe completo em [`02b-design/00-design-foundations.md`](02b-design/00-design
 
 **Critério de saída:** stack travada, modelo de domínio definido, contratos das Server Actions especificados, ADRs aprovados.
 
+**Estrutura obrigatória — 5 seções canônicas (Li et al. 2025, DeepCode §2.1):** toda Tech Spec abre com um Implementation Blueprint contendo cinco seções nomeadas: (B1) Project File Hierarchy, (B2) Component Specification, (B3) Verification Protocol, (B4) Execution Environment, (B5) Staged Development Plan. Detalhe em [`03-spec/00-tech-spec.md`](03-spec/00-tech-spec.md) §0.
+
 ### 4.4 Sprint planning (fase 04)
 
 **Objetivo:** quebrar o escopo aprovado em unidades de trabalho cabíveis.
