@@ -180,12 +180,104 @@ Se um subagente:
 |------|--------------|
 | Discovery | 1 agente, modo conversacional. Sem subagentes. |
 | PRD | 1 agente. Eventualmente subagente para validação de concorrência via web. |
-| Spec | 1 agente. Subagente paralelo só se houver ADRs independentes a redigir. |
+| Spec | 1 agente para produtos S; **Concept + Algorithm split** para produtos M+ (ver §"Concept + Algorithm split" abaixo). |
 | Sprint planning | 1 agente. |
 | Execução de story | 1 agente principal + browser subagent quando há UI. |
 | Refatoração grande | Workspace dedicado, agente separado, agent-driven com revisão. |
 | Hotfix | 1 agente, foco máximo, sem paralelismo. |
 | Documentação extensa | 1 agente sequencial, ou workspace separado em paralelo se docs são ortogonais ao código. |
+
+---
+
+## Concept + Algorithm split em fase Spec (produtos M+)
+
+Para produtos com domínio não-trivial (≥ 2 bounded contexts, ≥ 3 ADRs
+previstos, ou modelo de domínio em `02-domain-model.md`), a fase Spec
+ganha dois subagentes em paralelo (Li et al. 2025, DeepCode §2.1 —
+Multi-Agent Specification Analysis):
+
+| Subagente | Perspectiva | Responde a |
+|---|---|---|
+| **Concept Agent** | "o que" e "por que" | bounded contexts, agregados, eventos, casos de uso, RNFs |
+| **Algorithm Agent** | "como" | esquema de dados, contratos de Server Action, fluxo de auth, caching, observabilidade |
+
+### Briefing — Concept Agent
+
+```
+OBJETIVO
+A partir do PRD aprovado, produza o modelo conceitual da Tech Spec:
+seções B1 (File Hierarchy a nível de bounded context), §4 (Modelo de
+domínio), §8 (Auth de alto nível), §13 (Riscos técnicos do conceito).
+
+PRONTO QUANDO
+- [ ] docs/spec/00-tech-spec.md §4 preenchido com diagrama ER + dicionário
+- [ ] docs/spec/02-domain-model.md com ≥1 bounded context + agregados + eventos
+- [ ] §13 lista 3+ riscos com mitigação proposta
+
+NÃO FAÇA
+- Não escolha banco, ORM, provedor de auth, lib de validação — isso é do Algorithm Agent.
+- Não escreva código de Server Action ou schema SQL.
+- Não abra ADRs sem flag 🟡 — a reconciliação humana decide.
+
+LEIA APENAS
+- AGENTS.md
+- docs/prd/00-prd.md + docs/prd/01-glossary.md
+- harness/03-spec/02-domain-model.md (template)
+- harness/03-spec/00-tech-spec.md §0–§4, §13
+
+OUTPUT ESPERADO
+- Diff em docs/spec/ + sumário ≤ 5 linhas + lista de questões para
+  reconciliação humana.
+```
+
+### Briefing — Algorithm Agent
+
+```
+OBJETIVO
+A partir do PRD aprovado, produza o modelo algorítmico da Tech Spec:
+seções B2 (Component Specification), §5 (Schema), §6 (Contratos),
+§7 (Caching), §9 (Observabilidade), §10 (Performance), §11 (Segurança).
+
+PRONTO QUANDO
+- [ ] docs/spec/00-tech-spec.md §5 com schema inicial Drizzle + índices
+- [ ] §6 com contratos Zod por Server Action + webhooks
+- [ ] §10 com budgets explícitos
+- [ ] §11 com checklist por item
+
+NÃO FAÇA
+- Não defina bounded contexts, agregados ou eventos de domínio — isso é do Concept Agent.
+- Não escolha o "porquê" — só o "como" das decisões já enquadradas.
+- Não abra ADRs sem flag 🟡 — reconciliação humana decide.
+
+LEIA APENAS
+- AGENTS.md
+- docs/prd/00-prd.md
+- harness/03-spec/00-tech-spec.md §0, §5–§7, §9–§11
+
+OUTPUT ESPERADO
+- Diff em docs/spec/ + sumário ≤ 5 linhas + lista de questões para
+  reconciliação humana.
+```
+
+### Reconciliação — humana, não delegada
+
+Conflitos entre as duas perspectivas (ex.: Concept Agent define agregado
+`Inspection` rico em invariantes; Algorithm Agent escolhe schema CRUD que
+não suporta esses invariantes) **viram ADRs**. O eng lead reconcilia:
+
+1. Lê as duas saídas em paralelo.
+2. Para cada divergência relevante, abre ADR justificando a escolha.
+3. Aprova a versão final da Tech Spec só **depois** dos ADRs aceitos.
+
+A reconciliação **nunca** é delegada a um terceiro agente — esse é o
+ponto onde a decisão humana tem maior alavancagem.
+
+### Quando NÃO usar o split
+
+- Produtos S (1 bounded context, CRUD simples) — o overhead de coordenação
+  ultrapassa o ganho.
+- Refatoração de Spec já existente (use 1 agente focado).
+- Spec urgente em sprint de hotfix — sem fôlego para reconciliação.
 
 ---
 

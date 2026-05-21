@@ -392,3 +392,14 @@ Diagrame em Mermaid quando ajudar.
 Marque com 🟡 onde você assumiu algo que precisa de validação humana.
 Ao final, gere um Artifact com a Spec + lista de ADRs criados.
 ```
+
+### Variante para produtos M+ — Concept + Algorithm split
+
+Para produtos com domínio não-trivial (≥ 2 bounded contexts, ≥ 3 ADRs
+previstos, ou `02-domain-model.md` obrigatório), a fase Spec é gerada por
+**dois subagentes em paralelo** com briefings disjuntos — Concept Agent
+("o quê / por quê") e Algorithm Agent ("como"). A reconciliação é
+humana (eng lead) e os conflitos viram ADRs antes de aprovar a Spec.
+
+Protocolo completo: [`../05-execution/01-subagent-delegation.md`](../05-execution/01-subagent-delegation.md)
+§"Concept + Algorithm split em fase Spec".
