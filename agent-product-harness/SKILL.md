@@ -207,7 +207,9 @@ Before loading the story:
    [`references/05-execution/00-context-protocol.md`](references/05-execution/00-context-protocol.md) §"Bootstrap":
    load only AGENTS.md, `docs/prd/01-glossary.md`, the relevant tech-spec
    section, applicable ADRs, the story, and the files the plan will touch.
-   **Do not** load other stories or the full PRD.
+   **Do not** load other stories or the full PRD. For the tech-spec section
+   prefer `bash <skill>/references/scripts/spec-fetch.sh "<heading>"` —
+   it returns only the section asked for (Li et al. 2025, DeepCode §2.1).
 3. **If story `size` is M or larger and touches ≥3 layers**, decide whether
    to parallelize. If yes, produce `docs/sprints/<n>/<story-id>-analysis.md`
    per [`references/04-sprints/03-story-analysis-template.md`](references/04-sprints/03-story-analysis-template.md)

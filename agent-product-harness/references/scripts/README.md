@@ -48,6 +48,8 @@ aph/validate.sh
 | `story-list.sh` | Lista stories com badges. | `<sprint-N>?` |
 | `next-story.sh` | Próxima story pronta (sem dep não-resolvida). | `<sprint-N>?` |
 | `progress.sh` | Recalcula `progress:` no `sprint-plan.md`. | `<sprint-N>` |
+| `spec-fetch.sh` | Emite uma seção do Tech Spec (heading + corpo). Hierarchical Content Segmentation, Li et al. 2025. | `"<heading>" [<file>]` |
+| `spec-index.sh` | Gera índice JSON de headings do Tech Spec em `docs/spec/.00-tech-spec.index.json`. | `[<file>]` |
 | `_lib.sh` | Helpers (sourced por outros scripts). | — |
 | `_safety.sh` | Bloqueia escrita no próprio repo da skill. | — |
 

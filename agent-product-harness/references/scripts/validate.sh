@@ -144,6 +144,19 @@ while IFS= read -r f; do
   fi
 done < <(story_files)
 
+# 9b. Tech Spec heading uniqueness (precondition for spec-fetch.sh).
+if [[ -f docs/spec/00-tech-spec.md ]]; then
+  DUPES=$(grep -E '^#{1,6}[[:space:]]+' docs/spec/00-tech-spec.md \
+    | sed -E 's/^#+[[:space:]]+//; s/[[:space:]]+$//' \
+    | sort | uniq -d)
+  if [[ -n "$DUPES" ]]; then
+    fail_check "headings duplicados em docs/spec/00-tech-spec.md (quebra spec-fetch.sh):"
+    while IFS= read -r h; do echo "        $h"; done <<<"$DUPES"
+  else
+    ok "headings únicos em docs/spec/00-tech-spec.md"
+  fi
+fi
+
 # 10. ADR naming
 if [[ -d docs/spec/adr ]]; then
   while IFS= read -r adr; do

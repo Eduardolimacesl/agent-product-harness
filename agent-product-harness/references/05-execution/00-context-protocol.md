@@ -78,6 +78,18 @@ Quando uma sessão começa, o agente carrega na seguinte ordem (e nada mais):
 8. Os arquivos de código que o plano declara que serão tocados
 ```
 
+> **Hierarchical content segmentation** (Li et al. 2025, DeepCode §2.1):
+> para o passo 3, **não** abra o Tech Spec inteiro. Use:
+>
+> ```bash
+> bash <skill>/references/scripts/spec-fetch.sh "<heading exato ou substring>"
+> ```
+>
+> que devolve apenas a seção pedida (heading + corpo até o próximo heading
+> de nível igual ou superior). O índice JSON correspondente é gerado por
+> `spec-index.sh`. Headings duplicados quebram o fetch — `validate.sh`
+> falha quando há duplicatas. Liste o uso no Plan Artifact.
+
 > **Pré-flight:** se a story toca auth/RBAC/billing/PII e nenhum ADR aplicável existe em `docs/spec/adr/`, o passo 0 do plano é **redigir o ADR** — não escreve código antes (veja [`SKILL.md`](../../SKILL.md) §D).
 
 **Não carregar:**
