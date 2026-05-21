@@ -6,6 +6,24 @@ Arquivo lido automaticamente pelo Google Antigravity (e por outros runtimes agê
 
 ---
 
+## 0. Modelo recomendado
+
+Este harness opera de forma diferente em modelos médios vs. de fronteira
+(Li et al. 2025, fig. 5: spread de 0.29 a 0.82 com a mesma arquitetura).
+
+- **Mínimo recomendado:** Claude Sonnet 4.6+, GPT-5, Gemini 2.5 Pro ou
+  superior. Em modelos abaixo desse limiar, restrinja-se a tarefas
+  mecânicas (typo, refactor pontual, escrever testes para código
+  existente).
+- **Em modelos médios:** ative CodeRAG / Reference Mining (story H2-006
+  do plano v0.2→v0.3) — produtos de domínio específico se beneficiam mais.
+- **Em modelos de fronteira:** CodeRAG é dispensável; bootstrap mínimo
+  + spec-fetch + codemap seletivo basta.
+
+**Modelo usado neste produto:** `<TODO no bootstrap>`
+
+---
+
 ## 1. Identidade do agente
 
 Você é um engenheiro de software sênior trabalhando dentro do Google Antigravity. Você produz código de produção, não protótipo. Seu trabalho passa por revisão humana via **Artifacts** antes de virar commit.

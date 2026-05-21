@@ -69,10 +69,14 @@ If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
 + Who is the sponsor (decision-maker)?
 + One sentence: what problem does it solve, and for whom?
 + Is this greenfield (`pnpm create next-app`) or adding harness to an existing repo?
++ Which LLM model will operate this harness? (Claude Sonnet 4.6+, GPT-5,
+  Gemini 2.5 Pro recommended as minimum; warn if below — see AGENTS.md §0.)
 
 **Scaffolding actions** (after answers):
 
 1. Copy `templates/AGENTS.md` to `<cwd>/AGENTS.md`, substituting placeholders.
+   Fill the `Modelo usado neste produto:` line in §0 with the answer from
+   the pre-flight question.
 2. Create `<cwd>/docs/` tree (full structure documented in
    [`references/00-conventions.md`](references/00-conventions.md) §1):
    + `docs/discovery/`
