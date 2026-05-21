@@ -85,6 +85,9 @@ If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
    + `docs/memory/{discovery,prd,design,spec,sprints,execution,testing,deploys}/.gitkeep`.
    + `docs/memory/telemetry.jsonl` (empty file — deep telemetry; see
      [`references/05-execution/11-telemetry-protocol.md`](references/05-execution/11-telemetry-protocol.md)).
+   + `docs/memory/codemap/` — copy from `templates/docs/memory/codemap/`
+     (README + empty `modules/` + empty `graph.json`); see
+     [`references/05-execution/10-codemem-protocol.md`](references/05-execution/10-codemem-protocol.md).
    + `docs/runbooks/`.
 3. Create `<cwd>/skills/README.md` (empty product-internal skill registry).
 4. Create `<cwd>/mcp/registry.json` (empty MCP server registry).
@@ -238,7 +241,14 @@ Before loading the story:
    and attach the result to the Final Artifact.
 7. Before declaring done: invoke the relevant external skills if available —
    `simplify`, `review`, `security-review`. Generate a **Final Artifact**
-   (summary ≤5 lines, files changed, how to test, risks, next step).
+   (summary ≤5 lines, files changed, how to test, risks, next step). If
+   the story touched files under the codemap allowlist
+   (`src/domain/`, `src/application/`, `src/contracts/`, `app/(app)/`,
+   `lib/`), run
+   `bash <skill>/references/scripts/codemap-update.sh <story-id>` and fill
+   the entries it lists **in this same session** — then
+   `bash <skill>/references/scripts/codemap-graph.sh`. See
+   [`references/05-execution/10-codemem-protocol.md`](references/05-execution/10-codemem-protocol.md).
 8. **Pause for human review of the diff** (Gate 2).
 9. Write `docs/memory/execution/<YYYY-MM-DD>-<story-id>.md` per the template.
 10. Set `status: done` in the story frontmatter, then run

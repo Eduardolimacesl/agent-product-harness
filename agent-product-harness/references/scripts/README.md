@@ -52,6 +52,8 @@ aph/validate.sh
 | `spec-index.sh` | Gera índice JSON de headings do Tech Spec em `docs/spec/.00-tech-spec.index.json`. | `[<file>]` |
 | `telemetry-append.sh` | Anexa um evento ao `docs/memory/telemetry.jsonl`. Valida tipo, fase, JSON. | `--event <t> --phase <p> --data '<json>' [--story <id>]` |
 | `telemetry-report.sh` | Agrega telemetria: total, taxa de plan-rejection, gates falhados, drift ratio, duração média. | `[<jsonl-file>...]` |
+| `codemap-update.sh` | Detecta módulos públicos alterados pela story e lista entradas de codemap a (re)gerar. Determinístico, sem LLM. | `<story-id> [--base <ref>]` |
+| `codemap-graph.sh` | Regenera `docs/memory/codemap/graph.json` a partir dos `modules/*.md`. | — |
 | `_lib.sh` | Helpers (sourced por outros scripts). | — |
 | `_safety.sh` | Bloqueia escrita no próprio repo da skill. | — |
 

@@ -154,6 +154,10 @@ para identificar o que está pronto para começar.
 - [ ] Telemetria do novo evento configurada
 - [ ] Documentação atualizada
 - [ ] Smoke test em staging
+- [ ] **CodeMap atualizado**: se a story tocou arquivos sob a allowlist
+  (`src/domain/`, `src/application/`, `src/contracts/`, `app/(app)/`,
+  `lib/`), rodou `codemap-update.sh <story-id>`, preencheu as entradas
+  listadas e rodou `codemap-graph.sh`. Se não tocou, `validate.sh` confirma.
 - [ ] `status: done` no frontmatter; rodou `progress.sh <sprint>`
 
 ---

@@ -297,6 +297,22 @@ Porque cada camada tem custo diferente e propósito diferente:
 
 **A regra-mãe:** quando você passa de fase ou de story, **encerre a sessão do agente**. Comece nova. A Camada 4 zera. Camadas 1, 2 e 3 carregam o que importa.
 
+### 5.1 CodeMem como índice estrutural da Camada 2
+
+A Camada 2 (`docs/`) hoje contém Tech Spec (decisão arquitetural) e
+`_summary.md` por fase (narrativa). Falta uma terceira granularidade: a
+**interface pública por módulo** — quem expõe o quê, quem consome. Esse é
+o CodeMap (`docs/memory/codemap/`).
+
+Ele move o harness do nível "implicit/file-only" para "repository-based"
+na taxonomia de substrato de Ning et al. 2026 §4 — o gap que mais aparece
+em ablation de Li et al. 2025 (>2× em scores com dependências cruzadas).
+
+**Como se diferencia de `_summary.md`:** `_summary.md` é narrativo ("o que
+aconteceu na fase"); codemap é estrutural ("qual a forma do código hoje").
+Não se substituem. Protocolo:
+[`05-execution/10-codemem-protocol.md`](05-execution/10-codemem-protocol.md).
+
 ---
 
 ## 6. O ciclo de uma story (fluxo zoom-in)

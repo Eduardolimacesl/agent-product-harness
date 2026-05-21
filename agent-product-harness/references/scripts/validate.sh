@@ -194,6 +194,40 @@ if [[ -d docs/spec/adr ]]; then
   done < <(find docs/spec/adr -maxdepth 1 -name '*.md' 2>/dev/null)
 fi
 
+# 10b. CodeMap: every public-allowlist file must have a codemap entry.
+# Uses the same built-in include/exclude as codemap-update.sh (v0.2; v0.3+
+# parses docs/memory/codemap/README.md).
+if [[ -d docs/memory/codemap/modules ]]; then
+  CODEMAP_INCLUDES=(src/domain/ src/application/ src/contracts/ 'app/(app)/' lib/)
+  CODEMAP_EXCLUDES=(.test.ts .spec.ts __fixtures__ .d.ts)
+  MISSING=0
+  while IFS= read -r path; do
+    [[ -z "$path" ]] && continue
+    keep=0
+    for inc in "${CODEMAP_INCLUDES[@]}"; do
+      [[ "$path" == "$inc"* ]] && keep=1 && break
+    done
+    [[ $keep -eq 0 ]] && continue
+    for exc in "${CODEMAP_EXCLUDES[@]}"; do
+      if [[ "$path" == *"$exc"* ]]; then keep=0; break; fi
+    done
+    [[ $keep -eq 0 ]] && continue
+    slug=$(echo "$path" \
+      | sed -E 's@^src/@@; s@^app/@@; s@^lib/@@' \
+      | sed -E 's@\.(ts|tsx|js|jsx)$@@' \
+      | tr '/' '-' | tr -d '()')
+    if [[ ! -f "docs/memory/codemap/modules/${slug}.md" ]]; then
+      MISSING=$((MISSING + 1))
+      [[ $MISSING -le 5 ]] && warn "codemap ausente para $path (esperava modules/${slug}.md)"
+    fi
+  done < <(find src app lib -type f \( -name '*.ts' -o -name '*.tsx' \) 2>/dev/null | head -200)
+  if [[ $MISSING -eq 0 ]]; then
+    ok "codemap: todos os módulos públicos têm entrada"
+  else
+    fail_check "codemap: $MISSING módulo(s) público(s) sem entrada (rode codemap-update.sh)"
+  fi
+fi
+
 # 11. TDD: arquivos em src/domain/** ou src/application/** devem ter teste
 # correspondente em tests/unit/<mesmo-caminho-relativo>/. Apenas warn — não fail.
 # Só roda se o projeto adotou o layout Clean Arch (src/domain ou src/application).
