@@ -45,6 +45,7 @@ Route by user signal first. Cite only the section needed; don't load everything.
 | "implementar story X" | §D — Story execution | story file at `docs/sprints/<n>/<id>.md`; sprint-plan exists |
 | "corrigir bug em story X", "bug em #N" | §E — Bug execution | story `<id>` exists; new bug lives in same sprint folder |
 | "qual o status?", "o que falta?", "valida o projeto" | §F — Tracking via scripts | `docs/` exists |
+| "spec está errada / contradiz código" durante execução | §H — Spec Drift | story is in execution |
 | "sincronizar com GitHub", "epic em issues" | §G — GitHub sync (optional) | `gh` authed, `validate.sh` green |
 
 If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
@@ -314,6 +315,25 @@ does this mean", or the task requires writing content.
 
 ---
 
+## §H — Spec Drift
+
+When during execution you discover that the Tech Spec / PRD / ADR is **wrong,
+incomplete, or contradicts code reality**, follow the Spec Drift Protocol —
+silent workarounds are a Hard rule violation.
+
+1. Pause execution. No commits.
+2. Set `status: blocked-spec-drift` in the story frontmatter.
+3. Create `docs/sprints/<N>/<story-id>-drift.md` from
+   [`references/04-sprints/05-spec-drift-report-template.md`](references/04-sprints/05-spec-drift-report-template.md).
+4. Emit `spec_drift_detected` to telemetry once H1-003 is delivered.
+5. Wait for human decision: (A) fix Spec + retroactive ADR, (B) edit
+   the story, or (C) cancel. The story does not exit
+   `blocked-spec-drift` without a recorded decision.
+
+Full protocol: [`references/04-sprints/04-spec-drift-protocol.md`](references/04-sprints/04-spec-drift-protocol.md).
+
+---
+
 ## §G — GitHub sync (opcional)
 
 For teams that want public traceability of artifacts in GitHub Issues / PRs.
@@ -349,6 +369,10 @@ harness skill repo — `_safety.sh` enforces), `validate.sh` green.
   [`references/07-deploy/01-security-checklist.md`](references/07-deploy/01-security-checklist.md) §13a).
 + Never run `gh` write operations (issue create, PR create) without confirming
   the remote is the product repo, not the skill repo.
++ Never silently work around an incorrect blueprint. When the Tech Spec / PRD /
+  ADR is wrong, follow [`references/04-sprints/04-spec-drift-protocol.md`](references/04-sprints/04-spec-drift-protocol.md):
+  pause the story, write a drift report, wait for human decision. Modifying
+  scope or interpretation without a recorded decision is forbidden.
 
 ---
 

@@ -17,7 +17,7 @@ type: story                          # story | tech-task | spike | chore
 priority: P0                         # P0 | P1 | P2
 size: M                              # XS | S | M | L
 sprint: <N>
-status: todo                         # todo | doing | review | done
+status: todo                         # todo | doing | review | done | blocked-spec-drift | cancelled
 owner: unassigned
 created: <ISO 8601 UTC>
 updated: <ISO 8601 UTC>

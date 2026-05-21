@@ -43,3 +43,22 @@ if [[ -n "$NEXT" ]]; then
 else
   echo "Todas as fases têm _summary.md."
 fi
+
+# Stories blocked on Spec Drift — listed separately because they need
+# a human decision before they can move (see
+# references/04-sprints/04-spec-drift-protocol.md).
+DRIFT_FILES=()
+while IFS= read -r f; do
+  [[ -z "$f" ]] && continue
+  s=$(frontmatter_get "$f" status)
+  [[ "$s" == "blocked-spec-drift" ]] && DRIFT_FILES+=("$f")
+done < <(story_files)
+
+if [[ ${#DRIFT_FILES[@]} -gt 0 ]]; then
+  echo
+  echo "Stories bloqueadas em spec-drift (aguardam decisão humana):"
+  for f in "${DRIFT_FILES[@]}"; do
+    id=$(frontmatter_get "$f" id)
+    echo "  ⚠  $id  ($f)"
+  done
+fi
