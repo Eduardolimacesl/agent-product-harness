@@ -144,6 +144,21 @@ while IFS= read -r f; do
   fi
 done < <(story_files)
 
+# 8b. AGENTS.md (when present) must declare the three permission tiers.
+if [[ -f AGENTS.md ]]; then
+  MISSING_TIERS=()
+  for tier in "read-only" "sandbox-edit" "full-access"; do
+    if ! grep -qiE "^####?[[:space:]]+${tier}\\b" AGENTS.md; then
+      MISSING_TIERS+=("$tier")
+    fi
+  done
+  if [[ ${#MISSING_TIERS[@]} -eq 0 ]]; then
+    ok "AGENTS.md declara os três permission tiers"
+  else
+    warn "AGENTS.md sem allowlist para tier(s): ${MISSING_TIERS[*]}"
+  fi
+fi
+
 # 9a. Telemetry JSONL well-formedness — every non-blank line must parse.
 TELEM_FILES=$(find docs/memory -maxdepth 1 -name 'telemetry*.jsonl' 2>/dev/null || true)
 while IFS= read -r tf; do

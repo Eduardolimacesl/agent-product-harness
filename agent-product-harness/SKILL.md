@@ -385,26 +385,43 @@ harness skill repo — `_safety.sh` enforces), `validate.sh` green.
 
 ## Hard rules (override on conflict with user chat)
 
-+ Never run `git push`, `git reset --hard`, or any destructive command without
-  explicit human authorization — even if the user previously approved a similar
-  action in a different scope.
+Organized by **permission tier** (full model in
+[`references/05-execution/12-permission-tiers.md`](references/05-execution/12-permission-tiers.md)).
+Permission is **context-sensitive** — the same command can be safe in
+sandbox and dangerous in production. When in doubt, classify in the
+higher tier (fail-safe).
+
+### full-access — HITL required for each action
+
++ Never run `git push`, `git reset --hard`, `git rebase -i`, or any
+  history-rewriting operation without explicit human authorization — even
+  if the user previously approved a similar action in a different scope.
++ Never run `gh` write operations (issue create, PR create, comments)
+  without confirming the remote is the product repo, not the skill repo.
 + Never read or echo `.env*` files.
 + Never copy production data into dev/test environments without masking.
-+ Never create `tailwind.config.js` (Tailwind v4 is CSS-first via `@theme`).
-+ Never create `middleware.ts` (use `proxy.ts` in Next 16).
-+ Never use Pages Router patterns (`getServerSideProps`, etc.).
-+ Never parallelize subagents whose tasks touch overlapping files (see
-  [`references/05-execution/09-parallel-streams.md`](references/05-execution/09-parallel-streams.md) §7).
-+ Never advance a phase without `_summary.md` from the previous phase.
 + Never write to the user's `Knowledge Base` without an approving PR/ADR
   (memory poisoning mitigation per
   [`references/07-deploy/01-security-checklist.md`](references/07-deploy/01-security-checklist.md) §13a).
-+ Never run `gh` write operations (issue create, PR create) without confirming
-  the remote is the product repo, not the skill repo.
++ Never deploy to production or publish a package without HITL approval.
+
+### sandbox-edit — Plan Artifact (Gate 1) approved
+
++ Never advance a phase without `_summary.md` from the previous phase.
++ Never parallelize subagents whose tasks touch overlapping files (see
+  [`references/05-execution/09-parallel-streams.md`](references/05-execution/09-parallel-streams.md) §7).
+
+### Transversal (apply to all tiers)
+
++ Never create `tailwind.config.js` (Tailwind v4 is CSS-first via `@theme`).
++ Never create `middleware.ts` (use `proxy.ts` in Next 16).
++ Never use Pages Router patterns (`getServerSideProps`, etc.).
 + Never silently work around an incorrect blueprint. When the Tech Spec / PRD /
   ADR is wrong, follow [`references/04-sprints/04-spec-drift-protocol.md`](references/04-sprints/04-spec-drift-protocol.md):
   pause the story, write a drift report, wait for human decision. Modifying
   scope or interpretation without a recorded decision is forbidden.
++ Never bypass gates with `--no-verify`, `--force`, `--skip-checks` or
+  similar flags.
 
 ---
 

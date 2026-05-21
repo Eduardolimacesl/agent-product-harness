@@ -451,6 +451,13 @@ Funções:
 
 Quando uma rule do `AGENTS.md` ficar obsoleta, a alteração passa por **PR** — porque mudar a regra do jogo precisa de revisão humana. Não se altera por chat.
 
+**Modelo de permissão em três tiers** (Ning et al. 2026, §3.4.3): a
+allowlist do `AGENTS.md` é declarada em três blocos — `read-only` (sem
+gate), `sandbox-edit` (Plan Artifact aprovado), `full-access` (HITL para
+cada ação). Permissão é **context-sensitive** — o mesmo comando muda de
+tier conforme argumento e ambiente. Detalhe em
+[`05-execution/12-permission-tiers.md`](05-execution/12-permission-tiers.md).
+
 ---
 
 ## 9. Como a stack escolhida apoia o fluxo
@@ -539,7 +546,7 @@ telemetria é para agregar.
 | **Browser subagent** | screenshots, smoke visual | nada | edição de código |
 | **Subagente paralelo** | artefato escopado, contido | nada | tocar fora do briefing |
 
-A coluna mais importante é **"o que nunca faz"**. É o que define os limites do harness.
+A coluna mais importante é **"o que nunca faz"**. É o que define os limites do harness. Essa coluna é formalizada por tier em [`05-execution/12-permission-tiers.md`](05-execution/12-permission-tiers.md) — agente principal e subagentes operam por padrão em `sandbox-edit`, com `full-access` exigindo HITL ação-a-ação.
 
 ---
 
