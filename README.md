@@ -103,35 +103,52 @@ the skill. From there, the skill's instructions take over.
 
 ## Roadmap (skill maturity)
 
-### v0.1 — Bootstrap-capable from references *(current)*
+Change history per release: see [`CHANGELOG.md`](./CHANGELOG.md).
+
+### v0.1 — Bootstrap-capable from references
 
 - Skill is invocable, can answer methodology Q&A.
-- Bootstrap path falls back to "write each file using `references/<phase>/`
-  as a guide" because `templates/` is empty.
+- Bootstrap falls back to "write each file using `references/<phase>/` as a
+  guide" when `templates/` is empty.
 
-### v0.2 — Templates extracted
+### v0.2 — Fundação: estado estruturado + telemetria *(current)*
 
-- Each `references/0X-<phase>/` file gets a stripped, placeholder-driven twin
-  in `templates/docs/<phase>/`.
-- Bootstrap copies templates verbatim, then fills in answers from pre-flight
-  Q&A.
-- ~40 min per template file. Done as the first real product is bootstrapped
-  (extract while using).
+- **CodeMem layer** (`docs/memory/codemap/`) — structural per-module index;
+  closes the cross-file dependency gap (Li et al. 2025).
+- **Deep telemetry** (`docs/memory/telemetry.jsonl`) — 7 structured event
+  types + aggregation report (Ning et al. 2026, §3.5.1).
+- **Tech Spec 5-section blueprint** + `spec-fetch.sh` (hierarchical content
+  segmentation).
+- **Spec Drift Protocol** + `blocked-spec-drift` story status.
+- **Smoke Run** + named convergence criterion (correctness convergence).
+- Principles P6–P12 promoted into `00-architecture-and-flow.md`.
 
-### v0.3 — Skills internas como templates
+### v0.3 — Governança e refinamentos *(current)*
 
-- Add `templates/skills/` with seed product-internal skills:
-  `server-action-with-zod`, `proxy-security-headers`, `cache-component-pattern`
-  (all already exemplified in
-  [`references/05-execution/04-skill-template.md`](./agent-product-harness/references/05-execution/04-skill-template.md)).
+- **Permission tiers** (read-only / sandbox-edit / full-access) — Ning et
+  al. 2026, §3.4.3; context-sensitive.
+- **Change Contract** — `minor`/`major` PRs ao harness carregam 6 campos
+  (componente, modo de falha, melhoria, invariantes, falsificação,
+  rollback).
+- **Multi-Agent Specification Analysis** (Concept + Algorithm split em
+  fase Spec, produtos M+).
+- **Evidence Bundle** no Final Artifact (Gate 2) — regiões NÃO testadas
+  é campo obrigatório.
+- **Approvals Ledger** (`docs/memory/approvals.jsonl`) — HITL como estado
+  durável; aprovações com `becomes_rule` alimentam evolução de política.
+- **Reference Mining (CodeRAG) opcional** com allowlist de licenças.
+- **Modelo mínimo recomendado** declarado em `AGENTS.md §0`.
 
 ### v1.0 — Battle-tested
 
 - Used in ≥ 1 real product end-to-end.
-- Observability doc (`05-observability.md`) and memory-promotion doc
-  (`06-memory-promotion.md`) added — closes the P1 gaps from
-  [`references/00-paper-analysis.md`](./agent-product-harness/references/00-paper-analysis.md).
-- Princípios P6–P9 promoted from análise para `00-architecture-and-flow.md`.
+- Evolution Agent autônomo (Code-as-Harness §3.5.2) — meta-agente que muta
+  o harness a partir da telemetria; só após v0.2/v0.3 acumularem ≥2
+  sprints reais de dados.
+- Sandbox Agent autônomo em loop execution-error-fix.
+- Skills internas (`templates/skills/`) com seeds:
+  `server-action-with-zod`, `proxy-security-headers`,
+  `cache-component-pattern`.
 
 ---
 
