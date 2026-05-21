@@ -383,3 +383,18 @@ Acompanhe no Knowledge Base do projeto:
 | Testes pulados (`.skip`) | 0, ou justificativa em comentário |
 
 > Se algum dos alvos furar, abrir story de "saúde de testes" na próxima sprint.
+
+---
+
+## 11. Regiões NÃO testadas — input do Evidence Bundle
+
+Toda story produz, no Final Artifact, um campo **"Regiões NÃO testadas"**
+(seção 4.3 de [`../05-execution/06b-final-artifact-template.md`](../05-execution/06b-final-artifact-template.md))
+— obrigatório, sem string vazia. Razões legítimas: dependência externa
+sem mock confiável, UI sem ferramenta de validação visual no projeto,
+caso de borda de baixíssima probabilidade.
+
+A soma das "Regiões NÃO testadas" das stories de uma sprint **alimenta**
+a priorização da próxima sprint: cada lacuna recorrente vira candidata a
+story de "saúde de testes". Sem esse pipeline, lacunas de cobertura ficam
+invisíveis até o incidente.

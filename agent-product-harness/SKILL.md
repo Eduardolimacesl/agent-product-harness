@@ -245,8 +245,10 @@ Before loading the story:
    and attach the result to the Final Artifact.
 7. Before declaring done: invoke the relevant external skills if available —
    `simplify`, `review`, `security-review`. Generate a **Final Artifact**
-   (summary ≤5 lines, files changed, how to test, risks, next step). If
-   the story touched files under the codemap allowlist
+   following [`references/05-execution/06b-final-artifact-template.md`](references/05-execution/06b-final-artifact-template.md)
+   — summary, files, how to test, **Evidence Bundle** (§4: checks run,
+   invariants preserved, regions NOT tested, remaining risks), next step.
+   If the story touched files under the codemap allowlist
    (`src/domain/`, `src/application/`, `src/contracts/`, `app/(app)/`,
    `lib/`), run
    `bash <skill>/references/scripts/codemap-update.sh <story-id>` and fill
