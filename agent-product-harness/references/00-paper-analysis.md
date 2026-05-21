@@ -209,7 +209,9 @@ O paper define harness em §6 como **"o ambiente cognitivo desenhado dentro do q
 
 ## 2. Princípios do paper que merecem entrar explicitamente no harness
 
-O paper articula 4 princípios que estão hoje **implícitos** no nosso harness mas merecem virar explícitos. Eu os adicionaria a `00-architecture-and-flow.md` Seção 2 (princípios arquiteturais), elevando de 5 para 9:
+O paper articula 4 princípios que estão hoje **implícitos** no nosso harness mas merecem virar explícitos. Eu os adicionaria a `00-architecture-and-flow.md` Seção 2 (princípios arquiteturais), elevando de 5 para 9.
+
+> **Status (harness v0.2):** P6–P9 foram promovidos a [`00-architecture-and-flow.md`](00-architecture-and-flow.md) §2 na story H1-008 do plano de implementação v0.2→v0.3. As definições abaixo permanecem como justificativa de origem.
 
 ### P6 — Externalização não é gratuita (§8.4)
 

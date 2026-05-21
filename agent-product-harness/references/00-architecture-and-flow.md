@@ -24,7 +24,7 @@ Tudo orientado a um objetivo: **delegar com segurança partes do trabalho a agen
 
 ## 2. Princípios arquiteturais
 
-Cinco princípios sustentam todas as decisões deste harness. Quando algo parecer arbitrário, é porque deriva de um destes:
+Doze princípios sustentam todas as decisões deste harness. Quando algo parecer arbitrário, é porque deriva de um destes. P1–P5 são os fundamentos originais; P6–P9 vêm da análise Zhou et al. 2026 (externalização cognitiva); P10–P11 vêm da análise Li et al. 2025 (DeepCode); P12 vem da análise Ning et al. 2026 (Code as Agent Harness).
 
 ### P1 — Documento antes de código
 
@@ -45,6 +45,34 @@ O modo default é `agent-assisted`. `agent-driven` só é liberado quando há tr
 ### P5 — Sandbox sempre
 
 Terminal Sandbox ligado, escopo restrito ao workspace, allowlist explícita de comandos. O agente não rasga o repositório nem o sistema de arquivos por engano.
+
+### P6 — Externalização não é gratuita (Zhou et al. 2026, §8.4)
+
+Cada camada adicional de memória, schema ou regra impõe latência e overhead de raciocínio. Além de certo ponto, o modelo gasta mais esforço parseando e coordenando módulos do que resolvendo a tarefa. Toda adição ao harness deve passar pelo teste: *reduz o burden cognitivo do agente, ou apenas adiciona mais um?* Detalhe em [`00-paper-analysis.md`](00-paper-analysis.md) §2.
+
+### P7 — Recall vira Recognition (Zhou et al. 2026, §3.4)
+
+A transformação representacional converte um problema interno de recall em um problema externo de recognition-and-retrieval. Todo template do harness é desenhado para que o agente **reconheça** uma estrutura conhecida, não para que **reescreva** a estrutura do zero. Essa é a justificativa de existir dos templates de PRD, ADR, story, spec etc.
+
+### P8 — Os módulos competem pelo context window (Zhou et al. 2026, §7.1)
+
+Memory retrieval, skill loading e protocol schemas ocupam tokens. Expandir um módulo necessariamente comprime os outros. O "bootstrap mínimo" não é uma checklist passiva — é uma decisão **calculada** de orçamento de contexto por story.
+
+### P9 — A fronteira parametric/externalizado é móvel (Zhou et al. 2026, §7.3, §8.1)
+
+Quando modelos amadurecem, a partição ótima entre o que está nos pesos e o que está externalizado muda. Decisões de externalização (ex.: "use Zod sempre") são revisadas anualmente em sprint de saúde do harness, não tratadas como permanentes.
+
+### P10 — Maximização do Signal-to-Noise Ratio (Li et al. 2025, §3)
+
+Sucessor preciso de P2. Todo template, regra ou gate responde a uma pergunta única: *isso aumenta o SNR no contexto do agente, ou adiciona ruído?* P2 fala em volume; P10 fala em densidade — é o critério operacional ao escrever templates e revisar `AGENTS.md`.
+
+### P11 — Roteamento hierárquico > escala de contexto (Li et al. 2025, §1)
+
+Quando o agente está "perdido", a resposta default não é dar mais contexto nem trocar para um modelo maior. É **rotear melhor** a informação que já existe: bootstrap mais seletivo, índice hierárquico (cf. `spec-fetch.sh`, `codemap/`), recorte por dependência. O harness escala roteando, não inflando.
+
+### P12 — As quatro propriedades-alvo (Ning et al. 2026, §5.2.7)
+
+Todo componente do harness — template, script, regra, ritual — serve a pelo menos uma de quatro propriedades: **executável**, **inspecionável**, **stateful**, **governado**. Componente que não serve a nenhuma é candidato a remoção (corolário do P6). As quatro propriedades funcionam como checklist na auto-revisão semestral do harness.
 
 ---
 
