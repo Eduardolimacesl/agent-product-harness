@@ -80,6 +80,27 @@ Cada `_summary.md` segue este esqueleto. Campos vazios são proibidos: ou tem co
 
 - <observação 1> — proposta
 - <observação 2> — ...
+
+## 8. Smoke Run
+
+> **Obrigatório ao fechar uma sprint** (fase com app executável). Em fases sem
+> app rodável (Discovery, PRD, Design Foundations, Spec, Sprint planning),
+> registrar `n/a` com justificativa de uma linha.
+
+Critério de convergência: a sprint está convergida quando todos os itens abaixo
+estão verdes em ambiente limpo (≠ ambiente do agente que implementou).
+
+- [ ] `pnpm install` em ambiente limpo: sem erros, sem warnings de peer-dep.
+- [ ] `pnpm typecheck` verde.
+- [ ] `pnpm lint` verde.
+- [ ] `pnpm test` verde (unit + integration).
+- [ ] `pnpm dev` sobe e responde em ≤30s; rota principal renderiza.
+- [ ] README reflete o estado atual (comandos, pré-requisitos, variáveis).
+- [ ] Output do smoke anexado abaixo (≤30 linhas, truncar se preciso).
+
+```
+<colar output do smoke, truncado>
+```
 ```
 
 ---

@@ -80,6 +80,18 @@ for phase in discovery prd design spec sprints execution testing deploys; do
   fi
 done
 
+# 6b. Sprint summaries (in docs/memory/sprints/** or docs/sprints/<N>/_summary.md)
+# require the "## Smoke Run" section — correctness-convergence gate.
+SPRINT_SUMMARIES=$(find docs/memory/sprints docs/sprints -type f -name '_summary.md' 2>/dev/null || true)
+while IFS= read -r f; do
+  [[ -z "$f" ]] && continue
+  if ! grep -qE '^##[[:space:]]+Smoke Run\b' "$f"; then
+    fail_check "$f sem seção '## Smoke Run' (gate de convergência da Sprint)"
+  else
+    ok "$f tem '## Smoke Run'"
+  fi
+done <<<"$SPRINT_SUMMARIES"
+
 # 7+8+9. Frontmatter de stories
 ALL_IDS=()
 while IFS= read -r f; do

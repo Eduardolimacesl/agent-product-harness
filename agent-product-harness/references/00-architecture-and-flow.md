@@ -242,6 +242,14 @@ A fase 06 não é sequencial — ela é **transversal**. Testes nascem na fase 0
 
 **Outputs específicos da fase:** suíte E2E cobrindo P0 do PRD, configuração de Lighthouse CI, gates de cobertura no pipeline, testes de a11y automatizados.
 
+#### Critério de convergência do harness — nomeado
+
+O harness usa **correctness convergence** (Ning et al. 2026, §4.3.2): a Sprint converge quando gates objetivos passam em ambiente limpo, não quando o agente julga "está pronto". O sinal operacional é o `## Smoke Run` verde em [`docs/memory/sprints/<N>/_summary.md`](05-execution/05-phase-summary-template.md) ao fechar a sprint.
+
+Por que nomeamos? Os papers listam 6 critérios de convergência observados em harnesses reais: (1) correctness (test-gated), (2) consensus (multi-agent agree), (3) coverage (exhaustive enumeration), (4) budget (token/time cap), (5) explicit (human stop), (6) implicit (loop terminates after N iterations without criterion). O pior é o (6) — parar sem critério objetivo, comum em loops execution-error-fix. Adotamos (1) e, para gates HITL, (5). Recusamos (6) por design.
+
+Anti-padrão concreto: `_summary.md` declarado verde sem Smoke Run reproduzível é convergência implícita disfarçada de correctness.
+
 ### 4.7 Deploy (fase 07)
 
 **Objetivo:** levar a versão a produção de forma reversível.
