@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-product-harness.dev/schemas/spec-references.json",
+  "title": "Reference Mining manifest",
+  "description": "docs/spec/04-references.json — CodeRAG opt-in manifest. See references/03-spec/06-reference-mining.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["enabled", "repos", "tuples"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "enabled": { "type": "boolean" },
+    "generated_at": {
+      "anyOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "license_allowlist": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "repos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "url", "commit", "license", "scope"],
+        "properties": {
+          "name":    { "type": "string", "minLength": 1 },
+          "url":     { "type": "string", "format": "uri" },
+          "commit":  { "type": "string", "pattern": "^[a-f0-9]{7,40}$|^<sha-completo>$" },
+          "license": { "type": "string", "minLength": 1 },
+          "scope":   { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "tuples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_file", "target_component", "relationship_type", "confidence", "context"],
+        "properties": {
+          "source_file":       { "type": "string", "minLength": 1 },
+          "target_component":  { "type": "string", "minLength": 1 },
+          "relationship_type": {
+            "type": "string",
+            "enum": ["pattern", "api-shape", "algorithm", "data-model"]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          },
+          "context": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

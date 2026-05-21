@@ -198,6 +198,35 @@ if [[ -f docs/spec/00-tech-spec.md ]]; then
   fi
 fi
 
+# 9c. Reference Mining manifest (opt-in) — when present, validate licenses
+# against the allowlist (Reference Mining, references/03-spec/06-reference-mining.md §4).
+if [[ -f docs/spec/04-references.json ]]; then
+  if command -v jq >/dev/null 2>&1; then
+    if ! jq -e . docs/spec/04-references.json >/dev/null 2>&1; then
+      fail_check "docs/spec/04-references.json não é JSON válido"
+    else
+      ALLOWED="MIT Apache-2.0 BSD-2-Clause BSD-3-Clause ISC 0BSD"
+      BAD_LIC=$(jq -r '.repos[]?.license // empty' docs/spec/04-references.json \
+        | while IFS= read -r lic; do
+            [[ -z "$lic" ]] && continue
+            if ! echo " $ALLOWED " | grep -q " $lic "; then echo "$lic"; fi
+          done | sort -u)
+      if [[ -n "$BAD_LIC" ]]; then
+        # Tolerate when there is an ADR explicitly accepting non-allowlisted licenses.
+        if grep -lqiE "reference|license|coderag" docs/spec/adr/*.md 2>/dev/null; then
+          warn "licenças fora da allowlist em docs/spec/04-references.json: $(echo "$BAD_LIC" | tr '\n' ' ') — confirma ADR cobrindo"
+        else
+          fail_check "licenças fora da allowlist em docs/spec/04-references.json (precisa de ADR): $(echo "$BAD_LIC" | tr '\n' ' ')"
+        fi
+      else
+        ok "docs/spec/04-references.json: licenças todas na allowlist"
+      fi
+    fi
+  else
+    warn "jq ausente — não foi possível validar docs/spec/04-references.json"
+  fi
+fi
+
 # 10. ADR naming
 if [[ -d docs/spec/adr ]]; then
   while IFS= read -r adr; do
