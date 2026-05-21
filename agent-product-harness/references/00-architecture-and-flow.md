@@ -562,6 +562,16 @@ Sinais de que o harness precisa de revisão:
 
 Trate qualquer um desses sinais como dívida do harness e abra story para resolver na sprint de "saúde de processo".
 
+**Change Contract obrigatório** para mudanças `minor`/`major` no próprio
+harness (Ning et al. 2026, §5.2.3). Toda mudança não-trivial preenche o
+template em `.github/PULL_REQUEST_TEMPLATE/harness-change.md` com seis
+campos: componente, modo de falha, melhoria prevista, invariantes,
+falsificação, rollback. Detalhe em
+[`12-harness-evolution/00-change-contract.md`](12-harness-evolution/00-change-contract.md).
+**Evolution Agent autônomo** (CaH §3.5.2) — meta-agente que muta o harness
+sozinho a partir da telemetria — é visão de v1.0+, depois de a telemetria
+acumular dados; v0.3 fica no contrato manual.
+
 ---
 
 ## 13. Anti-padrões que o harness existe para impedir

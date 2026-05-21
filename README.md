@@ -143,12 +143,19 @@ This repo is the **single source of truth**. The cycle:
 2. Notice friction (rule that confuses, template field nobody fills, phase
    gate that always fails for the same reason).
 3. Open a PR here updating the relevant `references/` or `templates/` file.
+   **For `minor` or `major` changes**, fill the
+   [Change Contract template](./.github/PULL_REQUEST_TEMPLATE/harness-change.md) —
+   diagnose the failure mode, predict the improvement, name the invariants
+   to preserve, describe how to falsify, and document rollback. `patch`
+   changes (typo, clarification) are exempt.
 4. Tag a new version (`v0.X`).
 5. Pull the update into the runtime's skills directory (`git pull`).
 
 The §"Self-evolution" section of
 [`agent-product-harness/SKILL.md`](./agent-product-harness/SKILL.md) instructs
 the agent to **flag** harness debt during sessions so it surfaces here.
+Rationale for the Change Contract:
+[`references/12-harness-evolution/00-change-contract.md`](./agent-product-harness/references/12-harness-evolution/00-change-contract.md).
 
 ---
 

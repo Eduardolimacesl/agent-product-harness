@@ -428,3 +428,13 @@ If during a session you notice:
 
 flag it as a **harness debt** in the session's execution log, so it can become
 a PR against the skill repo later. Do not silently work around the harness.
+
+**Change Contract for `minor`/`major` PRs.** Every non-trivial mutation of
+the harness (new reference, new template, new script, new mandatory rule,
+breaking change) carries a *Change Contract* answering 6 questions:
+component changed, failure mode it attacks, predicted improvement,
+invariants to preserve, how to falsify, rollback. `patch` PRs (typo,
+clarification) are exempt. Template at
+[`.github/PULL_REQUEST_TEMPLATE/harness-change.md`](../.github/PULL_REQUEST_TEMPLATE/harness-change.md);
+rationale in
+[`references/12-harness-evolution/00-change-contract.md`](references/12-harness-evolution/00-change-contract.md).
