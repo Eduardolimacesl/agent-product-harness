@@ -186,6 +186,24 @@
 - [ ] Webhooks externos verificam HMAC + timestamp **antes** de qualquer parsing (ver `harness/05-execution/03-protocols.md` §5).
 - [ ] Toda Server Action retorna shape discriminado tipado (`{ ok: true, data } | { ok: false, code }`) — sem `Promise<unknown>` ou `Promise<any>`.
 
+### HITL / Approvals Ledger
+
+> Aprovações humanas em ações full-access são estado durável, não evento
+> efêmero (Ning et al. 2026, §5.2.5). Auditar o ledger fecha o loop e
+> evita que rejeições sejam re-tentadas silenciosamente.
+
+- [ ] **Auditoria mensal do `docs/memory/approvals.jsonl`:** toda entrada
+  `decision: rejected` é cruzada com a telemetria para confirmar que a
+  ação rejeitada não foi reexecutada por outro caminho.
+- [ ] Entradas com `becomes_rule != null` sem `promoted_to` por > 2
+  sprints disparam story de "promoção de políticas" — não deixar regras
+  candidatas eternamente em rascunho.
+- [ ] `evidence_shown` e `condition` revisados quanto a vazamento
+  acidental de PII / tokens / hashes.
+- [ ] Aprovações `approved-with-condition` cuja `condition` foi violada
+  (revelado em incidente ou retro) viram entrada explícita de incidente
+  + atualização da regra de tier.
+
 ---
 
 ## 14. Threat modeling rápido (STRIDE)

@@ -297,6 +297,21 @@ Porque cada camada tem custo diferente e propósito diferente:
 
 **A regra-mãe:** quando você passa de fase ou de story, **encerre a sessão do agente**. Comece nova. A Camada 4 zera. Camadas 1, 2 e 3 carregam o que importa.
 
+### 5.0.1 Estruturados na Camada 2/3: telemetria e ledger
+
+Além dos `_summary.md` (narrativos), a Camada 2/3 carrega duas séries
+**estruturadas e agregáveis**, que vivem fora dos templates de fase:
+
+- [`docs/memory/telemetry.jsonl`](05-execution/11-telemetry-protocol.md) —
+  *processo* de decisão do agente (plans, gates, intervenções).
+- [`docs/memory/approvals.jsonl`](05-execution/13-approvals-ledger.md) —
+  *decisões humanas em full-access* registradas como estado durável
+  (HITL não é evento efêmero).
+
+Aprovações com `becomes_rule` alimentam a evolução de política — viram
+PR contra `AGENTS.md` ou contra a tabela de tiers. Sem o ledger, a mesma
+decisão é re-deliberada em loop; com ele, vira regra acumulável.
+
 ### 5.1 CodeMem como índice estrutural da Camada 2
 
 A Camada 2 (`docs/`) hoje contém Tech Spec (decisão arquitetural) e

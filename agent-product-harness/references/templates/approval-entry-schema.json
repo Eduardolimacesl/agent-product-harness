@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-product-harness.dev/schemas/approval-entry.json",
+  "title": "Approval Ledger Entry",
+  "description": "One JSON object per line in docs/memory/approvals.jsonl. See references/05-execution/13-approvals-ledger.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ts",
+    "tier",
+    "action_proposed",
+    "evidence_shown",
+    "risks_surfaced",
+    "decision",
+    "decided_by"
+  ],
+  "properties": {
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "story_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["read-only", "sandbox-edit", "full-access"]
+    },
+    "action_proposed": { "type": "string", "minLength": 1 },
+    "evidence_shown": { "type": "string", "minLength": 1 },
+    "risks_surfaced": { "type": "string", "minLength": 1 },
+    "decision": {
+      "type": "string",
+      "enum": ["approved", "rejected", "approved-with-condition"]
+    },
+    "decided_by": { "type": "string", "minLength": 1 },
+    "condition": { "type": "string" },
+    "becomes_rule": { "type": "string" },
+    "promoted_to": {
+      "type": "string",
+      "description": "Optional annotation added after the rule was promoted to a versioned source (AGENTS.md / 12-permission-tiers.md). Format: <path>:<commit>"
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "decision": { "const": "approved-with-condition" } } },
+      "then": { "required": ["condition"] }
+    }
+  ]
+}

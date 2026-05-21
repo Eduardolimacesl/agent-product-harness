@@ -41,6 +41,7 @@ docs/
 │   ├── testing/_summary.md
 │   ├── deploys/_summary.md
 │   ├── telemetry.jsonl                 # deep telemetry, ver 05-execution/11-*
+│   ├── approvals.jsonl                 # HITL ledger, ver 05-execution/13-*
 │   └── codemap/                        # índice estrutural, ver 05-execution/10-*
 │       ├── README.md
 │       ├── modules/<slug>.md

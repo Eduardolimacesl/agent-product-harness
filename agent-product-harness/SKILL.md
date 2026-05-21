@@ -89,6 +89,8 @@ If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
    + `docs/memory/{discovery,prd,design,spec,sprints,execution,testing,deploys}/.gitkeep`.
    + `docs/memory/telemetry.jsonl` (empty file — deep telemetry; see
      [`references/05-execution/11-telemetry-protocol.md`](references/05-execution/11-telemetry-protocol.md)).
+   + `docs/memory/approvals.jsonl` (empty file — HITL approvals ledger;
+     see [`references/05-execution/13-approvals-ledger.md`](references/05-execution/13-approvals-ledger.md)).
    + `docs/memory/codemap/` — copy from `templates/docs/memory/codemap/`
      (README + empty `modules/` + empty `graph.json`); see
      [`references/05-execution/10-codemem-protocol.md`](references/05-execution/10-codemem-protocol.md).
@@ -394,6 +396,14 @@ sandbox and dangerous in production. When in doubt, classify in the
 higher tier (fail-safe).
 
 ### full-access — HITL required for each action
+
+Every full-access action is also **logged in the Approvals Ledger**
+(`docs/memory/approvals.jsonl`) — see
+[`references/05-execution/13-approvals-ledger.md`](references/05-execution/13-approvals-ledger.md).
+Use
+`bash <skill>/references/scripts/approvals-append.sh` after the human
+decides; capture `evidence_shown`, `risks_surfaced`, and (when
+applicable) `becomes_rule`.
 
 + Never run `git push`, `git reset --hard`, `git rebase -i`, or any
   history-rewriting operation without explicit human authorization — even

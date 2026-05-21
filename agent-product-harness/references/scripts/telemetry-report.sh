@@ -113,3 +113,30 @@ if command -v jq >/dev/null 2>&1; then
     echo "Duração média de story (min): $AVG  (n=$N)"
   fi
 fi
+
+# Approvals Ledger summary (separate file from telemetry).
+LEDGER="docs/memory/approvals.jsonl"
+if [[ -z "${FILES[0]:-}" ]] || [[ ! -f "${FILES[0]}" ]] || ! [[ "${FILES[0]}" == *approvals* ]]; then
+  ROOT2="$(repo_root 2>/dev/null)" || true
+  [[ -n "$ROOT2" && -f "$ROOT2/docs/memory/approvals.jsonl" ]] && LEDGER="$ROOT2/docs/memory/approvals.jsonl"
+fi
+if [[ -f "$LEDGER" ]]; then
+  echo
+  echo "Approvals ledger ($LEDGER):"
+  L_TOTAL=$(grep -c . "$LEDGER" 2>/dev/null || echo 0)
+  if command -v jq >/dev/null 2>&1; then
+    L_RULES=$(jq -r 'select(.becomes_rule != null and .becomes_rule != "") | .ts' "$LEDGER" 2>/dev/null | wc -l | tr -d ' ')
+    L_PROMOTED=$(jq -r 'select(.promoted_to != null and .promoted_to != "") | .ts' "$LEDGER" 2>/dev/null | wc -l | tr -d ' ')
+  else
+    L_RULES=$(grep -c '"becomes_rule"' "$LEDGER" 2>/dev/null || echo 0)
+    L_PROMOTED=$(grep -c '"promoted_to"' "$LEDGER" 2>/dev/null || echo 0)
+  fi
+  L_PENDING=$((L_RULES - L_PROMOTED))
+  printf "  total            %d\n" "$L_TOTAL"
+  printf "  com becomes_rule %d\n" "$L_RULES"
+  printf "  promovidas       %d\n" "$L_PROMOTED"
+  printf "  pendentes        %d\n" "$L_PENDING"
+  if [[ $L_PENDING -ge 5 ]]; then
+    warn "≥5 regras candidatas não promovidas — story de promoção de políticas?"
+  fi
+fi

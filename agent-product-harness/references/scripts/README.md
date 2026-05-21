@@ -54,6 +54,7 @@ aph/validate.sh
 | `telemetry-report.sh` | Agrega telemetria: total, taxa de plan-rejection, gates falhados, drift ratio, duração média. | `[<jsonl-file>...]` |
 | `codemap-update.sh` | Detecta módulos públicos alterados pela story e lista entradas de codemap a (re)gerar. Determinístico, sem LLM. | `<story-id> [--base <ref>]` |
 | `codemap-graph.sh` | Regenera `docs/memory/codemap/graph.json` a partir dos `modules/*.md`. | — |
+| `approvals-append.sh` | Anexa uma entrada ao `docs/memory/approvals.jsonl` (HITL ledger). Valida tier, decisão, JSON. | `--tier <t> --action "<>" --evidence "<>" --risks "<>" --decision <d> --by <name> [--story <id>] [--condition "<>"] [--becomes-rule "<>"]` |
 | `_lib.sh` | Helpers (sourced por outros scripts). | — |
 | `_safety.sh` | Bloqueia escrita no próprio repo da skill. | — |
 
