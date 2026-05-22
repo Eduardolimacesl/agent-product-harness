@@ -24,7 +24,7 @@ Tudo orientado a um objetivo: **delegar com segurança partes do trabalho a agen
 
 ## 2. Princípios arquiteturais
 
-Cinco princípios sustentam todas as decisões deste harness. Quando algo parecer arbitrário, é porque deriva de um destes:
+Doze princípios sustentam todas as decisões deste harness. Quando algo parecer arbitrário, é porque deriva de um destes. P1–P5 são os fundamentos originais; P6–P9 vêm da análise Zhou et al. 2026 (externalização cognitiva); P10–P11 vêm da análise Li et al. 2025 (DeepCode); P12 vem da análise Ning et al. 2026 (Code as Agent Harness).
 
 ### P1 — Documento antes de código
 
@@ -45,6 +45,34 @@ O modo default é `agent-assisted`. `agent-driven` só é liberado quando há tr
 ### P5 — Sandbox sempre
 
 Terminal Sandbox ligado, escopo restrito ao workspace, allowlist explícita de comandos. O agente não rasga o repositório nem o sistema de arquivos por engano.
+
+### P6 — Externalização não é gratuita (Zhou et al. 2026, §8.4)
+
+Cada camada adicional de memória, schema ou regra impõe latência e overhead de raciocínio. Além de certo ponto, o modelo gasta mais esforço parseando e coordenando módulos do que resolvendo a tarefa. Toda adição ao harness deve passar pelo teste: *reduz o burden cognitivo do agente, ou apenas adiciona mais um?* Detalhe em [`00-paper-analysis.md`](00-paper-analysis.md) §2.
+
+### P7 — Recall vira Recognition (Zhou et al. 2026, §3.4)
+
+A transformação representacional converte um problema interno de recall em um problema externo de recognition-and-retrieval. Todo template do harness é desenhado para que o agente **reconheça** uma estrutura conhecida, não para que **reescreva** a estrutura do zero. Essa é a justificativa de existir dos templates de PRD, ADR, story, spec etc.
+
+### P8 — Os módulos competem pelo context window (Zhou et al. 2026, §7.1)
+
+Memory retrieval, skill loading e protocol schemas ocupam tokens. Expandir um módulo necessariamente comprime os outros. O "bootstrap mínimo" não é uma checklist passiva — é uma decisão **calculada** de orçamento de contexto por story.
+
+### P9 — A fronteira parametric/externalizado é móvel (Zhou et al. 2026, §7.3, §8.1)
+
+Quando modelos amadurecem, a partição ótima entre o que está nos pesos e o que está externalizado muda. Decisões de externalização (ex.: "use Zod sempre") são revisadas anualmente em sprint de saúde do harness, não tratadas como permanentes.
+
+### P10 — Maximização do Signal-to-Noise Ratio (Li et al. 2025, §3)
+
+Sucessor preciso de P2. Todo template, regra ou gate responde a uma pergunta única: *isso aumenta o SNR no contexto do agente, ou adiciona ruído?* P2 fala em volume; P10 fala em densidade — é o critério operacional ao escrever templates e revisar `AGENTS.md`.
+
+### P11 — Roteamento hierárquico > escala de contexto (Li et al. 2025, §1)
+
+Quando o agente está "perdido", a resposta default não é dar mais contexto nem trocar para um modelo maior. É **rotear melhor** a informação que já existe: bootstrap mais seletivo, índice hierárquico (cf. `spec-fetch.sh`, `codemap/`), recorte por dependência. O harness escala roteando, não inflando.
+
+### P12 — As quatro propriedades-alvo (Ning et al. 2026, §5.2.7)
+
+Todo componente do harness — template, script, regra, ritual — serve a pelo menos uma de quatro propriedades: **executável**, **inspecionável**, **stateful**, **governado**. Componente que não serve a nenhuma é candidato a remoção (corolário do P6). As quatro propriedades funcionam como checklist na auto-revisão semestral do harness.
 
 ---
 
@@ -182,6 +210,8 @@ Detalhe completo em [`02b-design/00-design-foundations.md`](02b-design/00-design
 
 **Critério de saída:** stack travada, modelo de domínio definido, contratos das Server Actions especificados, ADRs aprovados.
 
+**Estrutura obrigatória — 5 seções canônicas (Li et al. 2025, DeepCode §2.1):** toda Tech Spec abre com um Implementation Blueprint contendo cinco seções nomeadas: (B1) Project File Hierarchy, (B2) Component Specification, (B3) Verification Protocol, (B4) Execution Environment, (B5) Staged Development Plan. Detalhe em [`03-spec/00-tech-spec.md`](03-spec/00-tech-spec.md) §0.
+
 ### 4.4 Sprint planning (fase 04)
 
 **Objetivo:** quebrar o escopo aprovado em unidades de trabalho cabíveis.
@@ -213,6 +243,14 @@ Detalhe completo em [`02b-design/00-design-foundations.md`](02b-design/00-design
 A fase 06 não é sequencial — ela é **transversal**. Testes nascem na fase 05 (TDD para domínio, test-after para UI) e a estratégia em `06-testing/00-testing-strategy.md` é o contrato que toda story respeita.
 
 **Outputs específicos da fase:** suíte E2E cobrindo P0 do PRD, configuração de Lighthouse CI, gates de cobertura no pipeline, testes de a11y automatizados.
+
+#### Critério de convergência do harness — nomeado
+
+O harness usa **correctness convergence** (Ning et al. 2026, §4.3.2): a Sprint converge quando gates objetivos passam em ambiente limpo, não quando o agente julga "está pronto". O sinal operacional é o `## Smoke Run` verde em [`docs/memory/sprints/<N>/_summary.md`](05-execution/05-phase-summary-template.md) ao fechar a sprint.
+
+Por que nomeamos? Os papers listam 6 critérios de convergência observados em harnesses reais: (1) correctness (test-gated), (2) consensus (multi-agent agree), (3) coverage (exhaustive enumeration), (4) budget (token/time cap), (5) explicit (human stop), (6) implicit (loop terminates after N iterations without criterion). O pior é o (6) — parar sem critério objetivo, comum em loops execution-error-fix. Adotamos (1) e, para gates HITL, (5). Recusamos (6) por design.
+
+Anti-padrão concreto: `_summary.md` declarado verde sem Smoke Run reproduzível é convergência implícita disfarçada de correctness.
 
 ### 4.7 Deploy (fase 07)
 
@@ -258,6 +296,37 @@ Porque cada camada tem custo diferente e propósito diferente:
 - **Camada 4** é volátil por design. Se ela sobrevive entre sessões, você está fazendo errado.
 
 **A regra-mãe:** quando você passa de fase ou de story, **encerre a sessão do agente**. Comece nova. A Camada 4 zera. Camadas 1, 2 e 3 carregam o que importa.
+
+### 5.0.1 Estruturados na Camada 2/3: telemetria e ledger
+
+Além dos `_summary.md` (narrativos), a Camada 2/3 carrega duas séries
+**estruturadas e agregáveis**, que vivem fora dos templates de fase:
+
+- [`docs/memory/telemetry.jsonl`](05-execution/11-telemetry-protocol.md) —
+  *processo* de decisão do agente (plans, gates, intervenções).
+- [`docs/memory/approvals.jsonl`](05-execution/13-approvals-ledger.md) —
+  *decisões humanas em full-access* registradas como estado durável
+  (HITL não é evento efêmero).
+
+Aprovações com `becomes_rule` alimentam a evolução de política — viram
+PR contra `AGENTS.md` ou contra a tabela de tiers. Sem o ledger, a mesma
+decisão é re-deliberada em loop; com ele, vira regra acumulável.
+
+### 5.1 CodeMem como índice estrutural da Camada 2
+
+A Camada 2 (`docs/`) hoje contém Tech Spec (decisão arquitetural) e
+`_summary.md` por fase (narrativa). Falta uma terceira granularidade: a
+**interface pública por módulo** — quem expõe o quê, quem consome. Esse é
+o CodeMap (`docs/memory/codemap/`).
+
+Ele move o harness do nível "implicit/file-only" para "repository-based"
+na taxonomia de substrato de Ning et al. 2026 §4 — o gap que mais aparece
+em ablation de Li et al. 2025 (>2× em scores com dependências cruzadas).
+
+**Como se diferencia de `_summary.md`:** `_summary.md` é narrativo ("o que
+aconteceu na fase"); codemap é estrutural ("qual a forma do código hoje").
+Não se substituem. Protocolo:
+[`05-execution/10-codemem-protocol.md`](05-execution/10-codemem-protocol.md).
 
 ---
 
@@ -397,6 +466,13 @@ Funções:
 
 Quando uma rule do `AGENTS.md` ficar obsoleta, a alteração passa por **PR** — porque mudar a regra do jogo precisa de revisão humana. Não se altera por chat.
 
+**Modelo de permissão em três tiers** (Ning et al. 2026, §3.4.3): a
+allowlist do `AGENTS.md` é declarada em três blocos — `read-only` (sem
+gate), `sandbox-edit` (Plan Artifact aprovado), `full-access` (HITL para
+cada ação). Permissão é **context-sensitive** — o mesmo comando muda de
+tier conforme argumento e ambiente. Detalhe em
+[`05-execution/12-permission-tiers.md`](05-execution/12-permission-tiers.md).
+
 ---
 
 ## 9. Como a stack escolhida apoia o fluxo
@@ -460,6 +536,16 @@ Cada gate do pipeline corresponde a uma garantia que o harness promete:
 
 Se um gate falha, o agente **não pode** declarar a tarefa pronta. O humano **não pode** mergear. Não há atalho.
 
+**Deep telemetry** (Ning et al. 2026, §3.5.1) é o substrato de
+observabilidade do próprio harness. Eventos estruturados em
+[`docs/memory/telemetry.jsonl`](05-execution/11-telemetry-protocol.md) —
+plan_submitted, plan_rejected, gate_failed, story_closed, etc. — alimentam
+métricas agregáveis (taxa de plan-rejection, tempo Plan→Diff, distribuição
+de falhas por gate). Sem isso, a revisão do harness é *anecdotal
+debugging*; com isso, vira *comparative diagnosis*. Coexiste com o log
+narrativo `docs/memory/execution/*.md` (que é para humanos lerem); a
+telemetria é para agregar.
+
 ---
 
 ## 11. O que cada papel faz no harness
@@ -475,7 +561,7 @@ Se um gate falha, o agente **não pode** declarar a tarefa pronta. O humano **n�
 | **Browser subagent** | screenshots, smoke visual | nada | edição de código |
 | **Subagente paralelo** | artefato escopado, contido | nada | tocar fora do briefing |
 
-A coluna mais importante é **"o que nunca faz"**. É o que define os limites do harness.
+A coluna mais importante é **"o que nunca faz"**. É o que define os limites do harness. Essa coluna é formalizada por tier em [`05-execution/12-permission-tiers.md`](05-execution/12-permission-tiers.md) — agente principal e subagentes operam por padrão em `sandbox-edit`, com `full-access` exigindo HITL ação-a-ação.
 
 ---
 
@@ -497,6 +583,16 @@ Sinais de que o harness precisa de revisão:
 - A taxa de retrabalho de plano-rejeitado está alta.
 
 Trate qualquer um desses sinais como dívida do harness e abra story para resolver na sprint de "saúde de processo".
+
+**Change Contract obrigatório** para mudanças `minor`/`major` no próprio
+harness (Ning et al. 2026, §5.2.3). Toda mudança não-trivial preenche o
+template em `.github/PULL_REQUEST_TEMPLATE/harness-change.md` com seis
+campos: componente, modo de falha, melhoria prevista, invariantes,
+falsificação, rollback. Detalhe em
+[`12-harness-evolution/00-change-contract.md`](12-harness-evolution/00-change-contract.md).
+**Evolution Agent autônomo** (CaH §3.5.2) — meta-agente que muta o harness
+sozinho a partir da telemetria — é visão de v1.0+, depois de a telemetria
+acumular dados; v0.3 fica no contrato manual.
 
 ---
 

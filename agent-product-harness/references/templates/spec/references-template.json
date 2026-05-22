@@ -1,0 +1,31 @@
+{
+  "$schema": "https://agent-product-harness.dev/schemas/spec-references.json",
+  "enabled": false,
+  "generated_at": null,
+  "license_allowlist": [
+    "MIT",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "0BSD"
+  ],
+  "repos": [
+    {
+      "name": "<nome curto>",
+      "url": "https://github.com/<owner>/<repo>",
+      "commit": "<sha-completo>",
+      "license": "MIT",
+      "scope": "<o que esta referência cobre, 1 linha>"
+    }
+  ],
+  "tuples": [
+    {
+      "source_file": "<repo-name>/<path>#L<from>-L<to>",
+      "target_component": "<caminho relativo no produto>",
+      "relationship_type": "pattern",
+      "confidence": "high",
+      "context": "<por que esta referência é relevante para o componente, 1 linha>"
+    }
+  ]
+}

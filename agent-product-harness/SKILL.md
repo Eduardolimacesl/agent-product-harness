@@ -45,6 +45,7 @@ Route by user signal first. Cite only the section needed; don't load everything.
 | "implementar story X" | §D — Story execution | story file at `docs/sprints/<n>/<id>.md`; sprint-plan exists |
 | "corrigir bug em story X", "bug em #N" | §E — Bug execution | story `<id>` exists; new bug lives in same sprint folder |
 | "qual o status?", "o que falta?", "valida o projeto" | §F — Tracking via scripts | `docs/` exists |
+| "spec está errada / contradiz código" durante execução | §H — Spec Drift | story is in execution |
 | "sincronizar com GitHub", "epic em issues" | §G — GitHub sync (optional) | `gh` authed, `validate.sh` green |
 
 If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
@@ -68,10 +69,14 @@ If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
 + Who is the sponsor (decision-maker)?
 + One sentence: what problem does it solve, and for whom?
 + Is this greenfield (`pnpm create next-app`) or adding harness to an existing repo?
++ Which LLM model will operate this harness? (Claude Sonnet 4.6+, GPT-5,
+  Gemini 2.5 Pro recommended as minimum; warn if below — see AGENTS.md §0.)
 
 **Scaffolding actions** (after answers):
 
 1. Copy `templates/AGENTS.md` to `<cwd>/AGENTS.md`, substituting placeholders.
+   Fill the `Modelo usado neste produto:` line in §0 with the answer from
+   the pre-flight question.
 2. Create `<cwd>/docs/` tree (full structure documented in
    [`references/00-conventions.md`](references/00-conventions.md) §1):
    + `docs/discovery/`
@@ -82,6 +87,13 @@ If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
      [`references/04-sprints/00-sprint-plan.md`](references/04-sprints/00-sprint-plan.md))
      — **not** just an empty folder.
    + `docs/memory/{discovery,prd,design,spec,sprints,execution,testing,deploys}/.gitkeep`.
+   + `docs/memory/telemetry.jsonl` (empty file — deep telemetry; see
+     [`references/05-execution/11-telemetry-protocol.md`](references/05-execution/11-telemetry-protocol.md)).
+   + `docs/memory/approvals.jsonl` (empty file — HITL approvals ledger;
+     see [`references/05-execution/13-approvals-ledger.md`](references/05-execution/13-approvals-ledger.md)).
+   + `docs/memory/codemap/` — copy from `templates/docs/memory/codemap/`
+     (README + empty `modules/` + empty `graph.json`); see
+     [`references/05-execution/10-codemem-protocol.md`](references/05-execution/10-codemem-protocol.md).
    + `docs/runbooks/`.
 3. Create `<cwd>/skills/README.md` (empty product-internal skill registry).
 4. Create `<cwd>/mcp/registry.json` (empty MCP server registry).
@@ -207,7 +219,9 @@ Before loading the story:
    [`references/05-execution/00-context-protocol.md`](references/05-execution/00-context-protocol.md) §"Bootstrap":
    load only AGENTS.md, `docs/prd/01-glossary.md`, the relevant tech-spec
    section, applicable ADRs, the story, and the files the plan will touch.
-   **Do not** load other stories or the full PRD.
+   **Do not** load other stories or the full PRD. For the tech-spec section
+   prefer `bash <skill>/references/scripts/spec-fetch.sh "<heading>"` —
+   it returns only the section asked for (Li et al. 2025, DeepCode §2.1).
 3. **If story `size` is M or larger and touches ≥3 layers**, decide whether
    to parallelize. If yes, produce `docs/sprints/<n>/<story-id>-analysis.md`
    per [`references/04-sprints/03-story-analysis-template.md`](references/04-sprints/03-story-analysis-template.md)
@@ -233,13 +247,35 @@ Before loading the story:
    and attach the result to the Final Artifact.
 7. Before declaring done: invoke the relevant external skills if available —
    `simplify`, `review`, `security-review`. Generate a **Final Artifact**
-   (summary ≤5 lines, files changed, how to test, risks, next step).
+   following [`references/05-execution/06b-final-artifact-template.md`](references/05-execution/06b-final-artifact-template.md)
+   — summary, files, how to test, **Evidence Bundle** (§4: checks run,
+   invariants preserved, regions NOT tested, remaining risks), next step.
+   If the story touched files under the codemap allowlist
+   (`src/domain/`, `src/application/`, `src/contracts/`, `app/(app)/`,
+   `lib/`), run
+   `bash <skill>/references/scripts/codemap-update.sh <story-id>` and fill
+   the entries it lists **in this same session** — then
+   `bash <skill>/references/scripts/codemap-graph.sh`. See
+   [`references/05-execution/10-codemem-protocol.md`](references/05-execution/10-codemem-protocol.md).
 8. **Pause for human review of the diff** (Gate 2).
 9. Write `docs/memory/execution/<YYYY-MM-DD>-<story-id>.md` per the template.
 10. Set `status: done` in the story frontmatter, then run
     `bash <skill>/references/scripts/progress.sh <n>` to recompute the sprint
     progress percentage.
 11. End the session.
+
+**Telemetry emission** — these events fire as side-effects of the steps
+above (not separate steps). See
+[`references/05-execution/11-telemetry-protocol.md`](references/05-execution/11-telemetry-protocol.md).
+
+| Step | Event |
+| :--- | :--- |
+| 4 (Plan Artifact submitted) | `plan_submitted` |
+| 4 (human approves / rejects) | `plan_approved` or `plan_rejected` |
+| 5 (typecheck/lint/test/e2e fails) | `gate_failed` |
+| 3 or 5 (subagent started) | `subagent_dispatched` |
+| 8 (Gate 2 fix requested) | `human_intervention` |
+| 10 (`status: done`) | `story_closed` |
 
 **External skills to chain** (if available in the runtime):
 
@@ -312,6 +348,28 @@ does this mean", or the task requires writing content.
 
 ---
 
+## §H — Spec Drift
+
+When during execution you discover that the Tech Spec / PRD / ADR is **wrong,
+incomplete, or contradicts code reality**, follow the Spec Drift Protocol —
+silent workarounds are a Hard rule violation.
+
+1. Pause execution. No commits.
+2. Set `status: blocked-spec-drift` in the story frontmatter.
+3. Create `docs/sprints/<N>/<story-id>-drift.md` from
+   [`references/04-sprints/05-spec-drift-report-template.md`](references/04-sprints/05-spec-drift-report-template.md).
+4. Emit `spec_drift_detected` to telemetry once H1-003 is delivered.
+5. Wait for human decision: (A) fix Spec + retroactive ADR, (B) edit
+   the story, or (C) cancel. The story does not exit
+   `blocked-spec-drift` without a recorded decision.
+
+The drift detection in step 3 emits `spec_drift_detected` to telemetry
+(see [`references/05-execution/11-telemetry-protocol.md`](references/05-execution/11-telemetry-protocol.md)).
+
+Full protocol: [`references/04-sprints/04-spec-drift-protocol.md`](references/04-sprints/04-spec-drift-protocol.md).
+
+---
+
 ## §G — GitHub sync (opcional)
 
 For teams that want public traceability of artifacts in GitHub Issues / PRs.
@@ -331,22 +389,51 @@ harness skill repo — `_safety.sh` enforces), `validate.sh` green.
 
 ## Hard rules (override on conflict with user chat)
 
-+ Never run `git push`, `git reset --hard`, or any destructive command without
-  explicit human authorization — even if the user previously approved a similar
-  action in a different scope.
+Organized by **permission tier** (full model in
+[`references/05-execution/12-permission-tiers.md`](references/05-execution/12-permission-tiers.md)).
+Permission is **context-sensitive** — the same command can be safe in
+sandbox and dangerous in production. When in doubt, classify in the
+higher tier (fail-safe).
+
+### full-access — HITL required for each action
+
+Every full-access action is also **logged in the Approvals Ledger**
+(`docs/memory/approvals.jsonl`) — see
+[`references/05-execution/13-approvals-ledger.md`](references/05-execution/13-approvals-ledger.md).
+Use
+`bash <skill>/references/scripts/approvals-append.sh` after the human
+decides; capture `evidence_shown`, `risks_surfaced`, and (when
+applicable) `becomes_rule`.
+
++ Never run `git push`, `git reset --hard`, `git rebase -i`, or any
+  history-rewriting operation without explicit human authorization — even
+  if the user previously approved a similar action in a different scope.
++ Never run `gh` write operations (issue create, PR create, comments)
+  without confirming the remote is the product repo, not the skill repo.
 + Never read or echo `.env*` files.
 + Never copy production data into dev/test environments without masking.
-+ Never create `tailwind.config.js` (Tailwind v4 is CSS-first via `@theme`).
-+ Never create `middleware.ts` (use `proxy.ts` in Next 16).
-+ Never use Pages Router patterns (`getServerSideProps`, etc.).
-+ Never parallelize subagents whose tasks touch overlapping files (see
-  [`references/05-execution/09-parallel-streams.md`](references/05-execution/09-parallel-streams.md) §7).
-+ Never advance a phase without `_summary.md` from the previous phase.
 + Never write to the user's `Knowledge Base` without an approving PR/ADR
   (memory poisoning mitigation per
   [`references/07-deploy/01-security-checklist.md`](references/07-deploy/01-security-checklist.md) §13a).
-+ Never run `gh` write operations (issue create, PR create) without confirming
-  the remote is the product repo, not the skill repo.
++ Never deploy to production or publish a package without HITL approval.
+
+### sandbox-edit — Plan Artifact (Gate 1) approved
+
++ Never advance a phase without `_summary.md` from the previous phase.
++ Never parallelize subagents whose tasks touch overlapping files (see
+  [`references/05-execution/09-parallel-streams.md`](references/05-execution/09-parallel-streams.md) §7).
+
+### Transversal (apply to all tiers)
+
++ Never create `tailwind.config.js` (Tailwind v4 is CSS-first via `@theme`).
++ Never create `middleware.ts` (use `proxy.ts` in Next 16).
++ Never use Pages Router patterns (`getServerSideProps`, etc.).
++ Never silently work around an incorrect blueprint. When the Tech Spec / PRD /
+  ADR is wrong, follow [`references/04-sprints/04-spec-drift-protocol.md`](references/04-sprints/04-spec-drift-protocol.md):
+  pause the story, write a drift report, wait for human decision. Modifying
+  scope or interpretation without a recorded decision is forbidden.
++ Never bypass gates with `--no-verify`, `--force`, `--skip-checks` or
+  similar flags.
 
 ---
 
@@ -374,3 +461,13 @@ If during a session you notice:
 
 flag it as a **harness debt** in the session's execution log, so it can become
 a PR against the skill repo later. Do not silently work around the harness.
+
+**Change Contract for `minor`/`major` PRs.** Every non-trivial mutation of
+the harness (new reference, new template, new script, new mandatory rule,
+breaking change) carries a *Change Contract* answering 6 questions:
+component changed, failure mode it attacks, predicted improvement,
+invariants to preserve, how to falsify, rollback. `patch` PRs (typo,
+clarification) are exempt. Template at
+[`.github/PULL_REQUEST_TEMPLATE/harness-change.md`](../.github/PULL_REQUEST_TEMPLATE/harness-change.md);
+rationale in
+[`references/12-harness-evolution/00-change-contract.md`](references/12-harness-evolution/00-change-contract.md).

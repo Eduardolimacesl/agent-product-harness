@@ -6,6 +6,24 @@ Arquivo lido automaticamente pelo Google Antigravity (e por outros runtimes agê
 
 ---
 
+## 0. Modelo recomendado
+
+Este harness opera de forma diferente em modelos médios vs. de fronteira
+(Li et al. 2025, fig. 5: spread de 0.29 a 0.82 com a mesma arquitetura).
+
+- **Mínimo recomendado:** Claude Sonnet 4.6+, GPT-5, Gemini 2.5 Pro ou
+  superior. Em modelos abaixo desse limiar, restrinja-se a tarefas
+  mecânicas (typo, refactor pontual, escrever testes para código
+  existente).
+- **Em modelos médios:** ative CodeRAG / Reference Mining (story H2-006
+  do plano v0.2→v0.3) — produtos de domínio específico se beneficiam mais.
+- **Em modelos de fronteira:** CodeRAG é dispensável; bootstrap mínimo
+  + spec-fetch + codemap seletivo basta.
+
+**Modelo usado neste produto:** `<TODO no bootstrap>`
+
+---
+
 ## 1. Identidade do agente
 
 Você é um engenheiro de software sênior trabalhando dentro do Google Antigravity. Você produz código de produção, não protótipo. Seu trabalho passa por revisão humana via **Artifacts** antes de virar commit.
@@ -20,17 +38,16 @@ Você é um engenheiro de software sênior trabalhando dentro do Google Antigrav
 - **Terminal Sandbox:** `ON`. Acesso a arquivos restrito ao workspace.
 - **Planning mode:** obrigatório para qualquer task com mais de 3 arquivos afetados ou que envolva schema, autenticação, billing ou deploy.
 
-### Allowlist de comandos de terminal (executar sem perguntar)
+### Allowlist por permission tier
+
+Modelo completo: [`05-execution/12-permission-tiers.md`](05-execution/12-permission-tiers.md).
+Permissão é **context-sensitive** — na dúvida, classifique no tier mais alto.
+
+#### read-only (sem gate)
 
 ```
-pnpm install
-pnpm dev
-pnpm build
-pnpm lint
-pnpm test
-pnpm test:unit
-pnpm test:e2e
 pnpm typecheck
+pnpm lint
 git status
 git diff
 git log
@@ -39,9 +56,40 @@ bash <skill>/references/scripts/phase-status.sh
 bash <skill>/references/scripts/sprint-status.sh
 bash <skill>/references/scripts/story-list.sh
 bash <skill>/references/scripts/next-story.sh
+bash <skill>/references/scripts/spec-fetch.sh
+bash <skill>/references/scripts/telemetry-report.sh
 ```
 
-Qualquer outro comando, **pergunte antes**. Especialmente: `rm`, `git push`, `git reset`, scripts de deploy, comandos com `sudo`, `curl | sh`, modificações em `.env*`.
+#### sandbox-edit (Plan Artifact aprovado — Gate 1)
+
+```
+pnpm install
+pnpm dev
+pnpm build
+pnpm test
+pnpm test:unit
+pnpm test:e2e
+git add
+git commit
+bash <skill>/references/scripts/telemetry-append.sh
+bash <skill>/references/scripts/codemap-update.sh
+bash <skill>/references/scripts/codemap-graph.sh
+bash <skill>/references/scripts/progress.sh
+```
+
+#### full-access (HITL para cada ação)
+
+```
+git push, git reset --hard, git rebase -i, git cherry-pick cross-branch
+gh (todas as operações de escrita)
+qualquer rm fora de /tmp ou node_modules
+comandos de deploy (pnpm deploy, vercel deploy, etc.)
+qualquer comando com sudo
+curl <url> | sh
+mutação de .env*
+```
+
+Qualquer comando fora destas três listas: **pergunte antes**.
 
 ---
 

@@ -39,7 +39,13 @@ docs/
 │   ├── sprints/_summary.md
 │   ├── execution/<YYYY-MM-DD>-<story-id>.md
 │   ├── testing/_summary.md
-│   └── deploys/_summary.md
+│   ├── deploys/_summary.md
+│   ├── telemetry.jsonl                 # deep telemetry, ver 05-execution/11-*
+│   ├── approvals.jsonl                 # HITL ledger, ver 05-execution/13-*
+│   └── codemap/                        # índice estrutural, ver 05-execution/10-*
+│       ├── README.md
+│       ├── modules/<slug>.md
+│       └── graph.json
 └── runbooks/
 ```
 
@@ -111,7 +117,7 @@ type: story | tech-task | spike | chore
 priority: P0 | P1 | P2
 size: XS | S | M | L
 sprint: <N>
-status: todo | doing | review | done
+status: todo | doing | review | done | blocked-spec-drift | cancelled
 owner: <nome | unassigned>
 created: <ISO 8601 UTC>
 updated: <ISO 8601 UTC>

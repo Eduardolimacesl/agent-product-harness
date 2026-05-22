@@ -17,7 +17,7 @@ type: story                          # story | tech-task | spike | chore
 priority: P0                         # P0 | P1 | P2
 size: M                              # XS | S | M | L
 sprint: <N>
-status: todo                         # todo | doing | review | done
+status: todo                         # todo | doing | review | done | blocked-spec-drift | cancelled
 owner: unassigned
 created: <ISO 8601 UTC>
 updated: <ISO 8601 UTC>
@@ -154,6 +154,10 @@ para identificar o que está pronto para começar.
 - [ ] Telemetria do novo evento configurada
 - [ ] Documentação atualizada
 - [ ] Smoke test em staging
+- [ ] **CodeMap atualizado**: se a story tocou arquivos sob a allowlist
+  (`src/domain/`, `src/application/`, `src/contracts/`, `app/(app)/`,
+  `lib/`), rodou `codemap-update.sh <story-id>`, preencheu as entradas
+  listadas e rodou `codemap-graph.sh`. Se não tocou, `validate.sh` confirma.
 - [ ] `status: done` no frontmatter; rodou `progress.sh <sprint>`
 
 ---

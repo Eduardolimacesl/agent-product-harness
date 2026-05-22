@@ -57,3 +57,27 @@ if [[ $TOTAL -gt 0 ]]; then
   echo
   echo "  Computed progress: ${pct}%"
 fi
+
+# Smoke Run convergence check (correctness convergence — see
+# 00-architecture-and-flow.md §4.6). The sprint is only considered
+# converged when its _summary.md has a "## Smoke Run" section.
+SUMMARY_CANDIDATES=(
+  "docs/memory/sprints/$SPRINT/_summary.md"
+  "docs/memory/sprints/_summary.md"
+  "docs/sprints/$SPRINT/_summary.md"
+)
+echo
+SUMMARY_FOUND=""
+for cand in "${SUMMARY_CANDIDATES[@]}"; do
+  if [[ -f "$cand" ]]; then
+    SUMMARY_FOUND="$cand"
+    break
+  fi
+done
+if [[ -z "$SUMMARY_FOUND" ]]; then
+  warn "Smoke Run: nenhum _summary.md encontrado para a sprint $SPRINT"
+elif grep -qE '^##[[:space:]]+Smoke Run\b' "$SUMMARY_FOUND"; then
+  ok "Smoke Run: seção presente em $SUMMARY_FOUND"
+else
+  fail "Smoke Run: $SUMMARY_FOUND não tem seção '## Smoke Run'"
+fi

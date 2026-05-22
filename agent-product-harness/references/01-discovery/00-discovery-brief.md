@@ -159,6 +159,22 @@ Liste fontes — entrevistas, dados, suporte, concorrência.
 
 ---
 
+## Opt-ins de Spec / Sprint
+
+> Decisões opcionais a serem confirmadas ao final do Discovery; cada uma
+> tem custo/benefício explícito. Default = desligado.
+
+- [ ] **Reference Mining (CodeRAG)** — minerar repositórios open-source
+  como referências para a Spec. Ativar se: domínio específico,
+  modelo médio operando o harness, ou repositório óbvio de referência
+  existe. Detalhe em [`../03-spec/06-reference-mining.md`](../03-spec/06-reference-mining.md).
+- [ ] **Concept + Algorithm split na Spec** — fase Spec gerada por dois
+  subagentes paralelos. Ativar se ≥ 2 bounded contexts ou ≥ 3 ADRs
+  previstos. Detalhe em [`../05-execution/01-subagent-delegation.md`](../05-execution/01-subagent-delegation.md)
+  §"Concept + Algorithm split".
+
+---
+
 ## Como instruir o agente nesta fase
 
 > Cole no chat do agente:

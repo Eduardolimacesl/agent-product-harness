@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-product-harness.dev/schemas/telemetry-event.json",
+  "title": "Telemetry Event",
+  "description": "One JSON object per line in docs/memory/telemetry.jsonl. See references/05-execution/11-telemetry-protocol.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ts", "event", "phase", "data"],
+  "properties": {
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp, e.g. 2026-01-15T14:30:00Z"
+    },
+    "event": {
+      "type": "string",
+      "enum": [
+        "plan_submitted",
+        "plan_approved",
+        "plan_rejected",
+        "gate_failed",
+        "subagent_dispatched",
+        "human_intervention",
+        "story_closed",
+        "spec_drift_detected"
+      ]
+    },
+    "story_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "bootstrap",
+        "discovery",
+        "prd",
+        "design",
+        "spec",
+        "sprint",
+        "execution",
+        "testing",
+        "deploy"
+      ]
+    },
+    "data": {
+      "type": "object",
+      "description": "Free-shape payload; per-event recommended fields documented in 11-telemetry-protocol.md §3."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "not": { "properties": { "phase": { "const": "bootstrap" } } } },
+      "then": { "required": ["story_id"] }
+    }
+  ]
+}

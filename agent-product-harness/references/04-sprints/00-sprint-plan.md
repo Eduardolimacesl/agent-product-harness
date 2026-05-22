@@ -2,6 +2,12 @@
 
 > 1 sprint = 1–2 semanas. Documento curto, vivo durante a sprint, congelado ao final.
 
+> **Relação com o Staged Development Plan (B5) da Tech Spec:** o §14 do Tech
+> Spec é a versão alto-nível por fase técnica; este sprint plan é a
+> decomposição executável da fase atual em stories. Mantenha a Tech Spec §14
+> alinhada — se a sprint reorganiza fases, atualize ambos (e registre ADR
+> retroativo se aplicável).
+
 **Sprint goal (1 frase):**
 
 ```

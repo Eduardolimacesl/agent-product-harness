@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-product-harness.dev/schemas/codemap-graph.json",
+  "generated_at": "<ISO 8601 UTC>",
+  "nodes": [
+    {
+      "module": "<nome>",
+      "path": "src/.../",
+      "status": "active"
+    }
+  ],
+  "edges": [
+    {
+      "from": "<modulo-A>",
+      "to": "<modulo-B>",
+      "kind": "imports",
+      "symbols": ["<simbolo>"]
+    }
+  ]
+}

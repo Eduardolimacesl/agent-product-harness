@@ -80,6 +80,18 @@ for phase in discovery prd design spec sprints execution testing deploys; do
   fi
 done
 
+# 6b. Sprint summaries (in docs/memory/sprints/** or docs/sprints/<N>/_summary.md)
+# require the "## Smoke Run" section — correctness-convergence gate.
+SPRINT_SUMMARIES=$(find docs/memory/sprints docs/sprints -type f -name '_summary.md' 2>/dev/null || true)
+while IFS= read -r f; do
+  [[ -z "$f" ]] && continue
+  if ! grep -qE '^##[[:space:]]+Smoke Run\b' "$f"; then
+    fail_check "$f sem seção '## Smoke Run' (gate de convergência da Sprint)"
+  else
+    ok "$f tem '## Smoke Run'"
+  fi
+done <<<"$SPRINT_SUMMARIES"
+
 # 7+8+9. Frontmatter de stories
 ALL_IDS=()
 while IFS= read -r f; do
@@ -132,6 +144,89 @@ while IFS= read -r f; do
   fi
 done < <(story_files)
 
+# 8b. AGENTS.md (when present) must declare the three permission tiers.
+if [[ -f AGENTS.md ]]; then
+  MISSING_TIERS=()
+  for tier in "read-only" "sandbox-edit" "full-access"; do
+    if ! grep -qiE "^####?[[:space:]]+${tier}\\b" AGENTS.md; then
+      MISSING_TIERS+=("$tier")
+    fi
+  done
+  if [[ ${#MISSING_TIERS[@]} -eq 0 ]]; then
+    ok "AGENTS.md declara os três permission tiers"
+  else
+    warn "AGENTS.md sem allowlist para tier(s): ${MISSING_TIERS[*]}"
+  fi
+fi
+
+# 9a. Telemetry JSONL well-formedness — every non-blank line must parse.
+TELEM_FILES=$(find docs/memory -maxdepth 1 -name 'telemetry*.jsonl' 2>/dev/null || true)
+while IFS= read -r tf; do
+  [[ -z "$tf" ]] && continue
+  if command -v jq >/dev/null 2>&1; then
+    BAD=$(grep -nv '^[[:space:]]*$' "$tf" | while IFS=: read -r ln rest; do
+      if ! echo "$rest" | jq -e . >/dev/null 2>&1; then
+        echo "L$ln"
+      fi
+    done)
+    if [[ -n "$BAD" ]]; then
+      fail_check "$tf tem linhas não-JSON: $(echo "$BAD" | tr '\n' ' ')"
+    else
+      ok "$tf é JSONL válido"
+    fi
+  else
+    # Minimal check: every non-empty line starts with { and ends with }
+    BAD=$(awk 'NF > 0 && !(/^\{.*\}$/) { printf "L%d ", NR }' "$tf")
+    if [[ -n "$BAD" ]]; then
+      fail_check "$tf tem linhas suspeitas (sem jq disponível): $BAD"
+    else
+      ok "$tf parece JSONL válido (sem jq)"
+    fi
+  fi
+done <<<"$TELEM_FILES"
+
+# 9b. Tech Spec heading uniqueness (precondition for spec-fetch.sh).
+if [[ -f docs/spec/00-tech-spec.md ]]; then
+  DUPES=$(grep -E '^#{1,6}[[:space:]]+' docs/spec/00-tech-spec.md \
+    | sed -E 's/^#+[[:space:]]+//; s/[[:space:]]+$//' \
+    | sort | uniq -d)
+  if [[ -n "$DUPES" ]]; then
+    fail_check "headings duplicados em docs/spec/00-tech-spec.md (quebra spec-fetch.sh):"
+    while IFS= read -r h; do echo "        $h"; done <<<"$DUPES"
+  else
+    ok "headings únicos em docs/spec/00-tech-spec.md"
+  fi
+fi
+
+# 9c. Reference Mining manifest (opt-in) — when present, validate licenses
+# against the allowlist (Reference Mining, references/03-spec/06-reference-mining.md §4).
+if [[ -f docs/spec/04-references.json ]]; then
+  if command -v jq >/dev/null 2>&1; then
+    if ! jq -e . docs/spec/04-references.json >/dev/null 2>&1; then
+      fail_check "docs/spec/04-references.json não é JSON válido"
+    else
+      ALLOWED="MIT Apache-2.0 BSD-2-Clause BSD-3-Clause ISC 0BSD"
+      BAD_LIC=$(jq -r '.repos[]?.license // empty' docs/spec/04-references.json \
+        | while IFS= read -r lic; do
+            [[ -z "$lic" ]] && continue
+            if ! echo " $ALLOWED " | grep -q " $lic "; then echo "$lic"; fi
+          done | sort -u)
+      if [[ -n "$BAD_LIC" ]]; then
+        # Tolerate when there is an ADR explicitly accepting non-allowlisted licenses.
+        if grep -lqiE "reference|license|coderag" docs/spec/adr/*.md 2>/dev/null; then
+          warn "licenças fora da allowlist em docs/spec/04-references.json: $(echo "$BAD_LIC" | tr '\n' ' ') — confirma ADR cobrindo"
+        else
+          fail_check "licenças fora da allowlist em docs/spec/04-references.json (precisa de ADR): $(echo "$BAD_LIC" | tr '\n' ' ')"
+        fi
+      else
+        ok "docs/spec/04-references.json: licenças todas na allowlist"
+      fi
+    fi
+  else
+    warn "jq ausente — não foi possível validar docs/spec/04-references.json"
+  fi
+fi
+
 # 10. ADR naming
 if [[ -d docs/spec/adr ]]; then
   while IFS= read -r adr; do
@@ -141,6 +236,40 @@ if [[ -d docs/spec/adr ]]; then
       fail_check "ADR $adr fora do padrão NNNN-slug.md"
     fi
   done < <(find docs/spec/adr -maxdepth 1 -name '*.md' 2>/dev/null)
+fi
+
+# 10b. CodeMap: every public-allowlist file must have a codemap entry.
+# Uses the same built-in include/exclude as codemap-update.sh (v0.2; v0.3+
+# parses docs/memory/codemap/README.md).
+if [[ -d docs/memory/codemap/modules ]]; then
+  CODEMAP_INCLUDES=(src/domain/ src/application/ src/contracts/ 'app/(app)/' lib/)
+  CODEMAP_EXCLUDES=(.test.ts .spec.ts __fixtures__ .d.ts)
+  MISSING=0
+  while IFS= read -r path; do
+    [[ -z "$path" ]] && continue
+    keep=0
+    for inc in "${CODEMAP_INCLUDES[@]}"; do
+      [[ "$path" == "$inc"* ]] && keep=1 && break
+    done
+    [[ $keep -eq 0 ]] && continue
+    for exc in "${CODEMAP_EXCLUDES[@]}"; do
+      if [[ "$path" == *"$exc"* ]]; then keep=0; break; fi
+    done
+    [[ $keep -eq 0 ]] && continue
+    slug=$(echo "$path" \
+      | sed -E 's@^src/@@; s@^app/@@; s@^lib/@@' \
+      | sed -E 's@\.(ts|tsx|js|jsx)$@@' \
+      | tr '/' '-' | tr -d '()')
+    if [[ ! -f "docs/memory/codemap/modules/${slug}.md" ]]; then
+      MISSING=$((MISSING + 1))
+      [[ $MISSING -le 5 ]] && warn "codemap ausente para $path (esperava modules/${slug}.md)"
+    fi
+  done < <(find src app lib -type f \( -name '*.ts' -o -name '*.tsx' \) 2>/dev/null | head -200)
+  if [[ $MISSING -eq 0 ]]; then
+    ok "codemap: todos os módulos públicos têm entrada"
+  else
+    fail_check "codemap: $MISSING módulo(s) público(s) sem entrada (rode codemap-update.sh)"
+  fi
 fi
 
 # 11. TDD: arquivos em src/domain/** ou src/application/** devem ter teste
