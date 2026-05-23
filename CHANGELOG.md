@@ -9,6 +9,66 @@ this project adheres to a semver-ish scheme at the **skill** level — see
 
 ---
 
+## [v0.4] — 2026-05-23
+
+> Coerência da spec via filosofia Spec-Driven Development (github/spec-kit):
+> trava a ambiguidade antes do código, eleva qualidade do produto a lei
+> versionada e checa coerência entre artefatos antes da Execução. Importa o
+> que faltava do SDD sem duplicar o que o harness já cobre (lifecycle,
+> memória, telemetria, segurança).
+
+### Added
+
+- **Clarify Protocol** — marcador `[NEEDS CLARIFICATION: <pergunta>]`
+  inline; o agente marca a lacuna em vez de adivinhar. Gate
+  anti-ambiguidade nas transições PRD → Spec e Spec → Sprint. Troca recall
+  por recognition (P7), maximiza SNR (P10). Importado de
+  `/speckit.clarify`.
+  - `references/03-spec/07-clarify-protocol.md` (8 categorias de varredura
+    por cobertura, log `## Clarifications`, relação com Spec Drift).
+  - `references/scripts/check-clarifications.sh` — detecta marcadores
+    abertos; promove `🟡` legado. Sai 0/1/2.
+  - Templates de PRD e Tech Spec trocam "marque com 🟡" pelo marcador
+    explícito; Tech Spec ganha seção `## Clarifications`.
+  - `validate.sh` sinaliza (soft) marcadores abertos.
+- **Constitution** — lei de qualidade **não-negociável do produto** em
+  `docs/memory/constitution.md`, distinta de `AGENTS.md` (rege o agente) e
+  dos princípios P1–P12 (regem o harness). 6 artigos canônicos (qualidade,
+  teste, UX, performance, segurança, simplicidade), só regras checáveis.
+  Ratificada no gate PRD → Spec; emendas com bump de `version`. Importado
+  de `/speckit.constitution`.
+  - `references/03-spec/08-constitution.md`
+  - `templates/docs/memory/constitution.md`
+  - `00-conventions.md` §2.8 (frontmatter) + tree de `docs/memory/`.
+  - Bootstrap (§A) copia o esqueleto; `validate.sh` avisa se ausente/draft
+    após a fase Spec.
+- **Cross-Artifact Analysis** — `check-cross-artifact.sh` verifica
+  coerência entre Constitution / PRD / Tech Spec / Stories **antes** da
+  Execução: `adr_refs` resolve (CRITICAL), PRD P0 coberto (CRITICAL), zero
+  marcadores (CRITICAL); Constitution ratificada, story↔Spec, contratos
+  citados (WARN). Pega incoerência cedo onde o Spec Drift pega tarde.
+  Importado de `/speckit.analyze`.
+  - `references/04-sprints/06-cross-artifact-analysis.md`
+  - `references/scripts/check-cross-artifact.sh` — best-effort grep/awk,
+    severidade CRITICAL/WARN. Sai 0/1/2.
+
+### Changed
+
+- `SKILL.md`: nova rota `§I — Clarify`; §A bootstrap cria
+  `constitution.md`; §B ganha gates de clarify (PRD→Spec, Spec→Sprint),
+  ratificação da Constitution (PRD→Spec) e cross-artifact (Sprint→Execução);
+  §C indexa as 3 referências novas; §D pré-flight roda
+  `check-cross-artifact.sh`; §F cataloga os 2 scripts novos.
+- `AGENTS.md` template: §9 referencia a Constitution; allowlist read-only
+  inclui `check-clarifications.sh` e `check-cross-artifact.sh`.
+- `00-architecture-and-flow.md`: §4.3 ganha os gates Clarify + Constitution;
+  §4.4 ganha o gate Cross-Artifact; §5.0.1 adiciona a Constitution como
+  terceira peça durável da Camada 2.
+- `references/README.md` e `references/scripts/README.md` indexam o novo
+  material.
+
+---
+
 ## [v0.3] — 2026-05-21
 
 > Governança e refinamentos: permissão em três tiers, HITL como estado

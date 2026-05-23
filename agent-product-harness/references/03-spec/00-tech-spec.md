@@ -6,7 +6,14 @@
 **Owner:** `<eng lead>`
 **Status:** `📝 draft | 👀 review | ✅ approved`
 **PRD de origem:** `docs/prd/<arquivo>.md`
+**Conformidade:** respeita `docs/memory/constitution.md` v`<X.Y>`
 **Última atualização:** `<YYYY-MM-DD>`
+
+> **Marcador de ambiguidade.** Toda decisão que esta Spec não responde é
+> marcada inline com `[NEEDS CLARIFICATION: <pergunta>]` — nunca adivinhada.
+> O gate Spec → Sprint exige zero marcadores
+> (`bash <skill>/references/scripts/check-clarifications.sh`). Protocolo:
+> [`07-clarify-protocol.md`](07-clarify-protocol.md).
 
 ---
 
@@ -371,7 +378,20 @@ CI deve **falhar** o build se ultrapassar.
 
 ---
 
-## 15. Aprovações
+## 15. Clarifications
+
+> Respostas humanas aos `[NEEDS CLARIFICATION]` desta Spec, por sessão datada.
+> Ao resolver, **remova o marcador inline** e reescreva o trecho com a decisão;
+> deixe o rastro aqui. Decisão com impacto arquitetural vira ADR, não só log.
+> Detalhe: [`07-clarify-protocol.md`](07-clarify-protocol.md) §5.
+
+### Sessão `<YYYY-MM-DD>`
+
+- P: `<pergunta>` → R: `<decisão>` (`<ADR-NNNN se aplicável>`)
+
+---
+
+## 16. Aprovações
 
 | Papel | Pessoa | Status |
 |-------|--------|--------|
@@ -389,7 +409,9 @@ Sua tarefa é gerar a Tech Spec a partir do PRD aprovado em docs/prd/.
 Para cada decisão técnica importante, abra um ADR em docs/spec/adr/ usando
 o template de ADR. Não escreva código de implementação ainda.
 Diagrame em Mermaid quando ajudar.
-Marque com 🟡 onde você assumiu algo que precisa de validação humana.
+NÃO adivinhe o que o PRD não responde: marque inline com
+[NEEDS CLARIFICATION: <pergunta>] e varra as 8 categorias de cobertura do
+07-clarify-protocol.md §4. Rode check-clarifications.sh antes de pedir o gate.
 Ao final, gere um Artifact com a Spec + lista de ADRs criados.
 ```
 

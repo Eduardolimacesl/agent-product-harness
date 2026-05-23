@@ -40,6 +40,7 @@ docs/
 │   ├── execution/<YYYY-MM-DD>-<story-id>.md
 │   ├── testing/_summary.md
 │   ├── deploys/_summary.md
+│   ├── constitution.md                 # lei de qualidade do produto, ver 03-spec/08-*
 │   ├── telemetry.jsonl                 # deep telemetry, ver 05-execution/11-*
 │   ├── approvals.jsonl                 # HITL ledger, ver 05-execution/13-*
 │   └── codemap/                        # índice estrutural, ver 05-execution/10-*
@@ -166,6 +167,23 @@ gate_1_approved: true | false        # plan artifact aprovado
 gate_2_approved: true | false        # diff aprovado
 ---
 ```
+
+### 2.8 Constitution — `docs/memory/constitution.md`
+
+```yaml
+---
+artifact: constitution
+version: <major.minor>               # bump a cada emenda
+status: draft | ratified
+ratified: <YYYY-MM-DD | TODO>
+created: <ISO 8601 UTC>
+updated: <ISO 8601 UTC>
+---
+```
+
+Corpo (artigos + log de emendas) segue
+[`03-spec/08-constitution.md`](03-spec/08-constitution.md). Ratificada no gate
+PRD → Spec; emendas exigem bump de `version` e entrada no log.
 
 ---
 

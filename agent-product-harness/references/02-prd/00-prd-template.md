@@ -197,6 +197,9 @@ Sua tarefa é me ajudar a transformar o Discovery Brief em PRD.
 Não escreva código. Não escolha tecnologia.
 Faça perguntas até preencher todas as seções com critérios verificáveis.
 Para cada critério de aceite, escreva no formato Given/When/Then.
-Marque com 🟡 qualquer ponto onde você inferiu algo no lugar de me perguntar.
+NÃO infira no lugar de perguntar: marque inline com
+[NEEDS CLARIFICATION: <pergunta>] (Clarify Protocol — references/03-spec/
+07-clarify-protocol.md). O gate PRD → Spec exige zero marcadores
+(bash <skill>/references/scripts/check-clarifications.sh docs/prd).
 Ao final, gere um Artifact com o PRD completo e liste o que ainda precisa de decisão.
 ```

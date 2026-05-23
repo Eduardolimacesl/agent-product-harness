@@ -212,6 +212,10 @@ Detalhe completo em [`02b-design/00-design-foundations.md`](02b-design/00-design
 
 **Estrutura obrigatória — 5 seções canônicas (Li et al. 2025, DeepCode §2.1):** toda Tech Spec abre com um Implementation Blueprint contendo cinco seções nomeadas: (B1) Project File Hierarchy, (B2) Component Specification, (B3) Verification Protocol, (B4) Execution Environment, (B5) Staged Development Plan. Detalhe em [`03-spec/00-tech-spec.md`](03-spec/00-tech-spec.md) §0.
 
+**Gate anti-ambiguidade (Clarify Protocol, filosofia SDD):** o agente nunca adivinha o que o PRD/Spec não responde — marca inline com `[NEEDS CLARIFICATION: <pergunta>]`. As transições PRD → Spec e Spec → Sprint exigem zero marcadores abertos (`check-clarifications.sh`). Troca recall por recognition (P7) e maximiza SNR (P10). Detalhe em [`03-spec/07-clarify-protocol.md`](03-spec/07-clarify-protocol.md).
+
+**Constitution (lei de qualidade do produto, filosofia SDD):** invariantes não-negociáveis do produto (qualidade, teste, UX, performance, segurança, simplicidade) vivem em `docs/memory/constitution.md`, ratificada no gate PRD → Spec. Distinta de `AGENTS.md` (rege o agente) e dos princípios P1–P12 (regem o harness): a Constitution rege **este produto**. Detalhe em [`03-spec/08-constitution.md`](03-spec/08-constitution.md).
+
 ### 4.4 Sprint planning (fase 04)
 
 **Objetivo:** quebrar o escopo aprovado em unidades de trabalho cabíveis.
@@ -223,6 +227,8 @@ Detalhe completo em [`02b-design/00-design-foundations.md`](02b-design/00-design
 **Quem trabalha:** time + 1 agente. O agente sugere quebra; humanos validam DoR.
 
 **Critério de saída:** stories no tamanho M ou menor, com critérios de aceite, mapa de workspaces e atribuição de agentes.
+
+**Gate de coerência (Cross-Artifact Analysis, filosofia SDD):** antes de a Execução começar, `check-cross-artifact.sh` verifica que os artefatos batem entre si — todo `adr_refs` resolve, toda user story P0 do PRD tem story, zero marcadores abertos, Constitution ratificada. Pega incoerência **cedo** (o conjunto inteiro), onde o Spec Drift Protocol pega **tarde** (um caso por vez, durante a execução). Detalhe em [`04-sprints/06-cross-artifact-analysis.md`](04-sprints/06-cross-artifact-analysis.md).
 
 ### 4.5 Execução (fase 05)
 
@@ -311,6 +317,12 @@ Além dos `_summary.md` (narrativos), a Camada 2/3 carrega duas séries
 Aprovações com `becomes_rule` alimentam a evolução de política — viram
 PR contra `AGENTS.md` ou contra a tabela de tiers. Sem o ledger, a mesma
 decisão é re-deliberada em loop; com ele, vira regra acumulável.
+
+Uma terceira peça durável da Camada 2 é a
+[`docs/memory/constitution.md`](03-spec/08-constitution.md) — a **lei de
+qualidade do produto**, atemporal e curada por humano (≠ telemetria/ledger,
+que são séries acumuladas pelo agente). Ratificada no gate PRD → Spec, é o
+ponto fixo que o gate de coerência cita para reprovar spec/plano que a viole.
 
 ### 5.1 CodeMem como índice estrutural da Camada 2
 

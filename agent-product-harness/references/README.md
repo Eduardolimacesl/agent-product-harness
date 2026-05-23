@@ -37,6 +37,12 @@ Documentos transversais à fase de Execução:
 - `05-execution/06-plan-artifact-template.md` — Plan Artifact obrigatório (Gate 1) antes de tocar código.
 - `05-execution/07-migration-checklist.md` — schema, RLS, triggers, seeds — gate de PR para qualquer story que mexa em DB.
 
+Gates de coerência da spec (filosofia Spec-Driven Development):
+
+- `03-spec/07-clarify-protocol.md` — marcadores `[NEEDS CLARIFICATION]`; gate anti-ambiguidade antes do planejamento (SDD `/clarify`).
+- `03-spec/08-constitution.md` — `docs/memory/constitution.md`, lei de qualidade não-negociável do produto (SDD constitution).
+- `04-sprints/06-cross-artifact-analysis.md` — coerência entre Constitution/PRD/Spec/Stories antes da Execução (SDD `/analyze`).
+
 ---
 
 ## Como usar com Antigravity

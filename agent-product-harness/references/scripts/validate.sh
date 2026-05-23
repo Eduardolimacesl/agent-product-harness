@@ -305,6 +305,29 @@ if [[ -d src/domain || -d src/application ]]; then
   fi
 fi
 
+# 12. Clarify markers (soft). Marcadores abertos são legítimos durante o draft;
+# o gate de transição é check-clarifications.sh. Aqui só sinalizamos.
+MARK_FILES=$(grep -rEl '\[NEEDS CLARIFICATION' docs/prd docs/spec 2>/dev/null || true)
+if [[ -n "$MARK_FILES" ]]; then
+  MARK_CNT=$(grep -rEho '\[NEEDS CLARIFICATION' docs/prd docs/spec 2>/dev/null | wc -l | tr -d ' ')
+  warn "marcadores [NEEDS CLARIFICATION] abertos ($MARK_CNT) — gates PRD→Spec/Spec→Sprint exigem zero (check-clarifications.sh)"
+fi
+
+# 13. Constitution (soft). Com Tech Spec presente, o produto deve ter uma
+# constitution ratificada (lei de qualidade — 03-spec/08-constitution.md).
+if [[ -f docs/spec/00-tech-spec.md ]]; then
+  if [[ ! -f docs/memory/constitution.md ]]; then
+    warn "docs/memory/constitution.md ausente — lei de qualidade do produto não definida"
+  else
+    CST_STATUS=$(frontmatter_get docs/memory/constitution.md status)
+    if [[ "$CST_STATUS" != "ratified" ]]; then
+      warn "docs/memory/constitution.md status '$CST_STATUS' (esperado: ratified após a fase Spec)"
+    else
+      ok "docs/memory/constitution.md ratificada"
+    fi
+  fi
+fi
+
 echo
 if [[ $FAILS -eq 0 ]]; then
   ok "validate: tudo verde"

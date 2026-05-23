@@ -52,6 +52,8 @@ git status
 git diff
 git log
 bash <skill>/references/scripts/validate.sh
+bash <skill>/references/scripts/check-clarifications.sh
+bash <skill>/references/scripts/check-cross-artifact.sh
 bash <skill>/references/scripts/phase-status.sh
 bash <skill>/references/scripts/sprint-status.sh
 bash <skill>/references/scripts/story-list.sh
@@ -211,6 +213,12 @@ Pare e pergunte se:
 
 ## 9. Memória e contexto
 
+- **`docs/memory/constitution.md`:** lei de qualidade **deste produto** —
+  invariantes não-negociáveis (qualidade de código, teste, UX, performance,
+  segurança, simplicidade). Distinta deste `AGENTS.md` (que rege o **agente**):
+  a Constitution rege o **produto**. Toda Tech Spec e Plan Artifact respeita a
+  versão vigente; o Gate 2 a usa como checklist. Guia em
+  `harness/references/03-spec/08-constitution.md`.
 - **Knowledge Base do Antigravity:** salve apenas padrões aprovados, ADRs finais, snippets reutilizáveis.
 - **`docs/memory/`:** cada sessão de execução produz um log resumido (template em `harness/05-execution/00-context-protocol.md`).
 - **Limpe o contexto entre fases.** Não arraste estado de discovery para execução.

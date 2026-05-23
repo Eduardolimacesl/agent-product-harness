@@ -111,7 +111,7 @@ Change history per release: see [`CHANGELOG.md`](./CHANGELOG.md).
 - Bootstrap falls back to "write each file using `references/<phase>/` as a
   guide" when `templates/` is empty.
 
-### v0.2 — Fundação: estado estruturado + telemetria *(current)*
+### v0.2 — Fundação: estado estruturado + telemetria
 
 - **CodeMem layer** (`docs/memory/codemap/`) — structural per-module index;
   closes the cross-file dependency gap (Li et al. 2025).
@@ -123,7 +123,7 @@ Change history per release: see [`CHANGELOG.md`](./CHANGELOG.md).
 - **Smoke Run** + named convergence criterion (correctness convergence).
 - Principles P6–P12 promoted into `00-architecture-and-flow.md`.
 
-### v0.3 — Governança e refinamentos *(current)*
+### v0.3 — Governança e refinamentos
 
 - **Permission tiers** (read-only / sandbox-edit / full-access) — Ning et
   al. 2026, §3.4.3; context-sensitive.
@@ -138,6 +138,19 @@ Change history per release: see [`CHANGELOG.md`](./CHANGELOG.md).
   durável; aprovações com `becomes_rule` alimentam evolução de política.
 - **Reference Mining (CodeRAG) opcional** com allowlist de licenças.
 - **Modelo mínimo recomendado** declarado em `AGENTS.md §0`.
+
+### v0.4 — Coerência da spec (filosofia Spec-Driven Development) *(current)*
+
+- **Clarify Protocol** — marcador `[NEEDS CLARIFICATION]`; gate
+  anti-ambiguidade nas transições PRD → Spec e Spec → Sprint
+  (`check-clarifications.sh`). Importado de `/speckit.clarify`.
+- **Constitution** (`docs/memory/constitution.md`) — lei de qualidade
+  não-negociável do produto, distinta de `AGENTS.md` e dos princípios
+  P1–P12; ratificada no gate PRD → Spec. Importado de
+  `/speckit.constitution`.
+- **Cross-Artifact Analysis** (`check-cross-artifact.sh`) — coerência entre
+  Constitution/PRD/Spec/Stories antes da Execução; pega incoerência cedo
+  onde o Spec Drift pega tarde. Importado de `/speckit.analyze`.
 
 ### v1.0 — Battle-tested
 

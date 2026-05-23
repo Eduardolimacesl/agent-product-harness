@@ -45,6 +45,7 @@ Route by user signal first. Cite only the section needed; don't load everything.
 | "implementar story X" | §D — Story execution | story file at `docs/sprints/<n>/<id>.md`; sprint-plan exists |
 | "corrigir bug em story X", "bug em #N" | §E — Bug execution | story `<id>` exists; new bug lives in same sprint folder |
 | "qual o status?", "o que falta?", "valida o projeto" | §F — Tracking via scripts | `docs/` exists |
+| "resolver ambiguidade", "clarify", "tem lacuna no PRD/Spec" | §I — Clarify | em fase PRD ou Spec |
 | "spec está errada / contradiz código" durante execução | §H — Spec Drift | story is in execution |
 | "sincronizar com GitHub", "epic em issues" | §G — GitHub sync (optional) | `gh` authed, `validate.sh` green |
 
@@ -91,6 +92,10 @@ If the signal is ambiguous, **ask one question** to disambiguate. Do not guess.
      [`references/05-execution/11-telemetry-protocol.md`](references/05-execution/11-telemetry-protocol.md)).
    + `docs/memory/approvals.jsonl` (empty file — HITL approvals ledger;
      see [`references/05-execution/13-approvals-ledger.md`](references/05-execution/13-approvals-ledger.md)).
+   + `docs/memory/constitution.md` — copy skeleton from
+     `templates/docs/memory/constitution.md` (`status: draft`); ratified at
+     the PRD → Spec gate. See
+     [`references/03-spec/08-constitution.md`](references/03-spec/08-constitution.md).
    + `docs/memory/codemap/` — copy from `templates/docs/memory/codemap/`
      (README + empty `modules/` + empty `graph.json`); see
      [`references/05-execution/10-codemem-protocol.md`](references/05-execution/10-codemem-protocol.md).
@@ -167,6 +172,20 @@ that is missing. The harness's value is the gate, not the speed.
   [`references/03-spec/02-domain-model.md`](references/03-spec/02-domain-model.md).
 + If the previous phase produced ADRs (Spec, Design Foundations) and none
   exist in `docs/spec/adr/`, require explicit justification in `_summary.md`.
++ **Clarify gate (PRD → Spec and Spec → Sprint):**
+  `bash <skill>/references/scripts/check-clarifications.sh` exits 0 — zero
+  open `[NEEDS CLARIFICATION]` markers in the artifact being gated. Resolve
+  via §I before advancing. See
+  [`references/03-spec/07-clarify-protocol.md`](references/03-spec/07-clarify-protocol.md).
++ **PRD → Spec also:** `docs/memory/constitution.md` is `status: ratified`
+  (≥1 checkable rule per applicable article) and
+  `bash <skill>/references/scripts/check-clarifications.sh docs/memory/constitution.md`
+  is clean (no leftover markers from the skeleton). See
+  [`references/03-spec/08-constitution.md`](references/03-spec/08-constitution.md).
++ **Sprint → Execução:**
+  `bash <skill>/references/scripts/check-cross-artifact.sh` exits 0 (no
+  CRITICAL) — artifacts are coherent across Constitution/PRD/Spec/Stories.
+  See [`references/04-sprints/06-cross-artifact-analysis.md`](references/04-sprints/06-cross-artifact-analysis.md).
 + `bash <skill>/references/scripts/validate.sh` exits 0.
 
 ---
@@ -188,7 +207,10 @@ Answer using the references, in this priority order:
 11. [`references/05-execution/01-subagent-delegation.md`](references/05-execution/01-subagent-delegation.md) — when to use subagents.
 12. [`references/05-execution/03-protocols.md`](references/05-execution/03-protocols.md) — MCP, Server Actions, webhooks.
 13. [`references/05-execution/04-skill-template.md`](references/05-execution/04-skill-template.md) — how product-internal skills are authored.
-14. [`references/00-paper-analysis.md`](references/00-paper-analysis.md) — for "why does the harness do X?" questions about gaps and rationale.
+14. [`references/03-spec/07-clarify-protocol.md`](references/03-spec/07-clarify-protocol.md) — `[NEEDS CLARIFICATION]` markers, anti-ambiguity gate (SDD `/clarify`).
+15. [`references/03-spec/08-constitution.md`](references/03-spec/08-constitution.md) — product-level non-negotiable quality law (SDD constitution).
+16. [`references/04-sprints/06-cross-artifact-analysis.md`](references/04-sprints/06-cross-artifact-analysis.md) — cross-artifact coherence gate before execution (SDD `/analyze`).
+17. [`references/00-paper-analysis.md`](references/00-paper-analysis.md) — for "why does the harness do X?" questions about gaps and rationale.
 
 Quote the relevant section. Do not paraphrase principles — they are deliberate.
 
@@ -211,6 +233,10 @@ Before loading the story:
   plan is to write the ADR** — no code without approved ADR.
 + `bash <skill>/references/scripts/validate.sh` exits 0 (catches mislocated
   stories, missing ADR folder, broken `depends_on`).
++ `bash <skill>/references/scripts/check-cross-artifact.sh` exits 0 (no
+  CRITICAL) — every story's `adr_refs` resolves, every PRD P0 is covered, no
+  open clarification markers. See
+  [`references/04-sprints/06-cross-artifact-analysis.md`](references/04-sprints/06-cross-artifact-analysis.md).
 
 ### Procedure
 
@@ -337,6 +363,8 @@ reconstruct the output manually. Catalog in
 | User signal | Script |
 |-------------|--------|
 | "valida o projeto", "está tudo certo?" | `bash <skill>/references/scripts/validate.sh` |
+| "tem lacuna?", "sobrou ambiguidade?" | `bash <skill>/references/scripts/check-clarifications.sh` |
+| "artefatos batem?", "pronto para executar?" | `bash <skill>/references/scripts/check-cross-artifact.sh` |
 | "em que fase estamos?" | `bash <skill>/references/scripts/phase-status.sh` |
 | "status da sprint" | `bash <skill>/references/scripts/sprint-status.sh [<N>]` |
 | "liste as stories" | `bash <skill>/references/scripts/story-list.sh [<N>]` |
@@ -384,6 +412,30 @@ Mapping in one line:
 
 **Pre-flight:** `gh` authed, remote points at the product repo (not the
 harness skill repo — `_safety.sh` enforces), `validate.sh` green.
+
+---
+
+## §I — Clarify (resolução de ambiguidade)
+
+When the PRD or Tech Spec leaves a decision unanswered, **mark it, do not
+guess**. This is the anti-hallucination gate imported from SDD (`/clarify`).
+Full protocol: [`references/03-spec/07-clarify-protocol.md`](references/03-spec/07-clarify-protocol.md).
+
+1. Insert `[NEEDS CLARIFICATION: <pergunta>]` inline at the exact spot —
+   one binary/multiple-choice question per marker.
+2. When closing PRD/Spec, sweep the 8 coverage categories (§4 of the
+   protocol): actors/permissions, states, edge cases, data/retention,
+   errors, non-functionals, integrations, scope.
+3. Run `bash <skill>/references/scripts/check-clarifications.sh` — it lists
+   open markers (default scope: `docs/prd` + `docs/spec`).
+4. Present markers to the human. Record answers in the artifact's
+   `## Clarifications` log (dated session); architectural answers become ADRs.
+5. Remove the inline marker and rewrite the passage with the decision. The
+   PRD → Spec and Spec → Sprint gates refuse to advance while markers are open.
+
+**Not clarify:** ambiguity resolvable by reading, typos, cosmetic choices.
+**Vs. Spec Drift (§H):** clarify is *before* planning (spec doesn't answer);
+drift is *during* execution (spec contradicts code).
 
 ---
 
